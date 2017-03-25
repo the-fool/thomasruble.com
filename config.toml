@@ -1,0 +1,34 @@
+baseurl = "http://thomasruble.com/"
+theme = "cocoa-eh"
+builddrafts = true
+canonifyurls = true
+contentdir = "content"
+languageCode = "en-US"
+layoutdir = "layouts"
+publishdir = "public"
+author = "Thomas Ruble"
+title = "The Fool"
+disqusshortname = "ruble"
+pluralizelisttitles = false
+
+[permalinks]
+blog = "blog/:slug/"
+
+[params]
+latestpostcount = 5
+dateform = "Jan 2, 2006"
+dateformfull = "Mon Jan 2 2006 15:04:05 MST"
+description = "Example blog"
+copyright = "Copyright © 2017 Thomas Ruble"
+logofile = "img/foologo.png"
+faviconfile = "img/logo.png"
+highlightjs = true
+extracssfiles = [ "/css/solarized-light.css", "/css/style.css" ]       # In your `static` directory, add/remove files as necessary.
+progressively = true
+lang = "en"
+github = "example"
+email = "you@example.com"
+linkedin = "john-example-aa80ue8è"
+twitter = "example"
+social_banner = "img/banner.png"
+highlightjslanguages = ["elm", "typescript"]
