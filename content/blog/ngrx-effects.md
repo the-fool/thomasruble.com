@@ -6,13 +6,13 @@ tags = ["redux", "ngrx", "angular"]
 
 # Abstract
 
-Angular has `ngrx/store` & `ngrx/effects`.  It seems the dust has settled surrounding the `Store` approach to state management, but I've noticed people still toeing the water with effect-managers.  The following explores what's at stake, while using a classic Angular http data-service as an example.  I'll show a way to reign in XHR stuff, and make code more reusable & composable.  Spoiler: `ngrx/effects` bestows great happiness and good fortune.
+Angular has `ngrx/store` & `ngrx/effects`.  When it comes to `Store`, it seems the dust has settled on it's accepted virtues for state-management.  But I've noticed people still toeing the water with effect-management.  The following explores what's at stake, while using a classic Angular http data-service as an example.  I'll show a way to reign in XHR stuff, and make code more reusable & composable.  Spoiler: `ngrx/effects` bestows great happiness and good fortune.
 
 # I mean . . . what *is* redux, *maaaann*?
 
-That *model-view-controller* design sure has staying power, doesn't it?  It's easy to speculate why.  We know that separating concerns & isolating responsibilities in our code make that it easier on our minds, and also easier to write.  But what are the most *basic* responsibilities a program could have?
+That *model-view-controller* design sure has staying power, doesn't it?  It's easy to speculate why.  We know that separating concerns & isolating responsibilities makes code easier on the gulliver.  So let's go down to bedrock: what are the most *basic* responsibilities a program can be split into?
 
-Consider two programs chained with the 'nix pipe: `cat | grep`.  Each program takes an input, operates on that input, and produces an output.  MVC is an **I/O process** by another name, smelling as sweet.  The *essential shape* of the input is the **model**, the *actual output* is the **view**, and all the processing that happens in between is the **controller**.  The model is the contract we make with our program's input, and the view is the contract we make with the program's output.  Now, 'controller' is kind of an overloaded word -- is control really what's at stake?  The **c** in MVC is really just a good old function, or sub-routine: it takes in a model, functions a little, and outputs.  It would be nice to name the pattern MVF(unction), or MVU(pdate) -- but that ship has sailed.
+Consider two programs chained with the 'nix pipe: `cat | grep`.  Each program takes an input, operates on that input, and produces an output.  Can't get much simpler than this.  Now, 'MVC' is an **I/O process** by another name, smelling as sweet.  The *essential shape* of the input is the **model**, the *actual output* is the **view**, and all the processing that happens in between is the **controller**.  The model is the contract we make with our program's input, and the view is the contract we make with the program's output.  Now, 'controller' is kind of an overloaded word -- is control really what's at stake?  The **c** in MVC is really just an effectful function: it takes in a model, functions a little, and outputs.  It would be nice to name the pattern MVF(unction), or MVU(pdate) -- but that ship has sailed.
 
 **Redux** is just MVC all over again -- but *this time we mean business*.  Redux is the thought that, "Hey, it's not 'models-views-conrollers' -- it's just one of each!"  After all, an orthodox redux store is just *one function*, and the whole app state is modelled by *one type*.
 
@@ -110,7 +110,7 @@ A service (or `provider` if you like) is great for this.  They are the layer in 
 
 The question is *how do we get data from our service into our* `Store`?
 
-Let's say our whale `reducer` had a `LOAD` action, which just replaced our `WhaleState` with a new list of whales:
+Let's say our whale `reducer` had a `'LOAD'` action, which just replaced our `WhaleState` with a new list of whales:
 
 ```typescript
 class LoadWhalesSuccess {
