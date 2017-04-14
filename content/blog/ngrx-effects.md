@@ -1,7 +1,7 @@
 +++
 date = "2017-03-23T21:24:05-05:00"
 title = "ngrx/effects: why and when?"
-tags = ["redux", "ngrx", "angular"]
+tags = ["redux", "ngrx", "angular", "spa"]
 +++
 
 # Abstract
