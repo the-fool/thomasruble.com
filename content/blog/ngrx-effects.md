@@ -2,6 +2,8 @@
 date = "2017-03-23T21:24:05-05:00"
 title = "ngrx/effects: why and when?"
 tags = ["redux", "ngrx", "angular", "spa"]
+description = "ngrx/effects offers a pattern to decouple our imperative side-effect code from our state-management strategy"
+keywords = ["ngrx", "effects", "redux", "angular"]
 +++
 
 # Abstract
