@@ -1,8 +1,13 @@
 +++
 date = "2015-08-19T20:29:37-07:00"
 title = "Elm Brain"
+description = "A neural network toy app in Elm"
 +++
 
-_In this theme, it is possible to add sections like a Projects one for example. You can add plenty of articles about your projects and a presentation page that will be displayed before the list. All is modulable, if you don't want something._
+![elm brain ui](/img/elm-brain.png "App UI")
 
-A Hollywood-funded film version, produced and filmed in the UK, was released in April 2005, and radio adaptations of the third, fourth, and fifth novels were broadcast from 2004 to 2005. Adams did many of these adaptations, including the novels, the TV series, the computer game, and the earliest drafts of the Hollywood film’s screenplay, and some of the stage shows introduced new material written by Adams.
+_[View the live demo here](https://the-fool.github.io/elm-brain/)_
+
+[Elm](http://elm-lang.org/) is one of my favorite things.  As part of my learning process, I tried to re-implement Google's neat little app: [The Neural Net Playground](http://playground.tensorflow.org/).  It was a great way to learn the language and functional programming patterns!
+
+[View code here](https://github.com/the-fool/elm-brain)
