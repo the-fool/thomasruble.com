@@ -50,7 +50,7 @@ What we want to do is _queue_ a slightly delayed task that polls the backend ser
 
 # Implementation Decision
 
-To play with WebSockets in Django, there [are](https://django-websocket-redis.readthedocs.io/en/latest/) [options](https://github.com/GetBlimp/django-websocket-request).  But going forward it seems pretty safe to assert that Channels is going to be the _de jure_ solution, as well as _de facto_.
+To play with WebSockets in Django, [there are options](https://djangopackages.org/grids/g/websockets/).  But it seems pretty safe to assert that Channels is going to be the _de jure_ solution, as well as _de facto_.
 
 But what about our timeout intervals?
 
