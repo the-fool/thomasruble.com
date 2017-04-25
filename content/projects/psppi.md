@@ -1,5 +1,5 @@
 +++
-date = "2015-08-19T20:29:37-07:00"
+date = "2017-02-23T20:29:37-07:00"
 title = "Public Poll Visualizer"
 description = "An interactive data visualization for the Paul Simon Public Policy Institute"
 +++

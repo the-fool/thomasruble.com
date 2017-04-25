@@ -116,7 +116,7 @@ services:
     command: python manage.py rundelay
 ```
 
-We have 3 separate services, although 2 of them are nearly identical.  The first Django service, which executes the 'runserver' command, is going to be the 'main' public facing web-server.  The second Django service is our 'delay server', whose mission is to handle the timeouts and enqueing of delayed tasks.
+We have 3 separate services, but 2 of them are nearly identical.  The first Django service, which executes the 'runserver' command, is going to be the 'main' public facing web-server.  The second Django service is our 'delay server', whose mission is to handle the timeouts and enqueing of delayed tasks.
 
 If you don't recognize the `rundelay` argument passed to `manage.py`, don't fret!  It's a new feature added when we hook in the Django Channels app.  In our `settings.py` file you'll find:
 
