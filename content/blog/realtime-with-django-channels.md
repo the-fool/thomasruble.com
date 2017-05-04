@@ -8,7 +8,7 @@ keywords = ["django", "channels", "websocket", "realtime", "websockets"]
 
 # Abstract
 
-What follows is a simple demo for using the [Delay Server](https://channels.readthedocs.io/en/stable/delay.html) in [Django Channels](https://github.com/django/channels) to deliver asynchronous real-time progress updates over WebSockets.  Our demo backend will execute a long-running 'backround task', and then send progress updates at regular intervals to a WebSocket client.  We'll also use channels to distribute our server load over multiple queues and worker processes.
+What follows is a simple demo for using the [Delay Server](https://channels.readthedocs.io/en/stable/delay.html) in [Django Channels](https://github.com/django/channels) to deliver asynchronous real-time progress updates over WebSockets.  Our demo backend will execute a long-running 'background task', and then send progress updates at regular intervals to a WebSocket client.  We'll also use channels to distribute our server load over multiple queues and worker processes.
 
 Full project code [here](https://github.com/the-fool/prog-rock)
 
