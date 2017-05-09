@@ -29,7 +29,7 @@ I forgot to mention WebSockets -- Django Channels also provides a pretty neat wa
 
 # The Problem:  Real-Time status updates at regular intervals
 
-I was recently charged to write a web-server that handles requests from its web-client for starting a long-running task on _another_ server, and then sending the results back once it's complete.  The web-server is something of a proxy, brokering events between a backend service and a web-client.  It listens to a client, and sends the request for a task on through to theservice.  But this backend service _also_ provides a way to retrieve the progress of a task it's working on.  Since I can get the progress of a task, I also want to update the client at _regular intervals_ with the status.
+I was recently charged to write a web-server that handles requests from its web-client for starting a long-running task on _another_ server, and then sending the results back once it's complete.  The web-server is something of a proxy, brokering events between a backend service and a web-client.  It listens to a client, and sends the request for a task on through to the service.  But this backend service _also_ provides a way to retrieve the progress of a task it's working on.  Since I can get the progress of a task, I also want to update the client at _regular intervals_ with the status.
 
 One way to get regular updates is to let the _client_ drive by making many HTTP requests over time, polling our web-server.  The downside of this is processing overhead for the backend (not only with respect to the bulky HTTP packets, but also that every request needs to be authenticated afresh).  Rejected!
 
