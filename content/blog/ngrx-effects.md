@@ -8,7 +8,7 @@ keywords = ["ngrx", "effects", "redux", "angular"]
 
 # Abstract
 
-Angular has `ngrx/store` & `ngrx/effects`.  When it comes to using `ngrx/store`, it seems the dust has settled on the virtue of a redux-esque store for state-management.  But I've noticed people still toeing the water with effect-management.  The following explores what's at stake, while using a classic Angular http data-service as an example.  I'll show a way to reign in XHR stuff, and make code more reusable & composable.  Spoiler: `ngrx/effects` bestows great happiness and good fortune.
+Angular has `ngrx/store` & `ngrx/effects`.  When it comes to using `ngrx/store`, it seems the dust has settled on the virtue of a redux-esque store for state-management.  But I've noticed people still toeing the water with effect-management.  The following explores what's at stake, while using a classic Angular HTTP data-service as an example.  I'll show a way to rein in XHR stuff, and make code more reusable & composable.  Spoiler: `ngrx/effects` bestows great happiness and good fortune.
 
 # I mean . . . what *is* redux, *maaaann*?
 
