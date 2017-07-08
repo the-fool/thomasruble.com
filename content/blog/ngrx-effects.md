@@ -278,13 +278,13 @@ Gone is the `Store`.  Our service has one role, which is marshalling data to-and
 
 ## The payoff
 
-So, our data-services don't need to know about the implementation our `Store`, and our view components don't need to know about the implementation of our data-services.  This responsibility got passed up to the `Store`.  But this is more than just a shell game.  Just as how grouping all state-management into one domain gives us code-joy, so does grouping our effect management.  Once we step outside of the land of trivial examples into a regular complicated app, we can avail ourselves of the fact that all our effects take place in `Observable` pipelines, which means we can compose 'em all.
+So, our data-services don't need to know about the implementation of our `Store`, and our view components don't need to know about the implementation of our data-services.  This responsibility got passed up to the `Store`.  But this is more than just a shell game.  Just as how grouping all state-management into one domain gives us code-joy, so does grouping our effect management.  Once we step outside of the land of trivial examples into a regular complicated app, we can avail ourselves of the fact that all our effects take place in `Observable` pipelines, which means we can compose 'em all.
 
-But that's not all -- since an `@Effect` function itself always results in dispatching an `Action`, the effects can daisy-chain on each other.  For example, there could be another effect listening to type `'LOAD_WHALE_ERROR'` which sends an XHR to some error-logger on another service.  No matter what effectul feature you need, you can do it by chaining & composing these things.
+But that's not all -- since an `ngrx` `@Effect` function can return an `Action`, the effects can daisy-chain on each other.  For example, there could be another effect listening to type `'LOAD_WHALE_ERROR'` which sends an XHR to some error-logger on another service.  No matter what effectul feature you need, you can do it by chaining & composing these things.
 
 ![The One](/img/one.png "Logo Title Text 1")
 
-We are doing MVC the right way -- with a single Brain-Controller-Update thing.  It provides a **unified** and **declarative** interface for the whole rest of our app code.  We don't call methods on a multitude of services, we just dispatch messages and subscribe to events through a single gateway.  Our app is gathered together through one pattern that manages both our state and our effects.
+We are doing MVC the right way -- with a single Brain/Controller/Updater thing.  It provides a **unified** and **declarative** interface for the whole rest of our app code.  We don't call methods on a multitude of services, we just dispatch messages and subscribe to events through a single gateway.  Our app is gathered together through one pattern that manages both our state and our effects.
 
 It's also worth adding that `ngrx` (and redux) have great tooling, which includes code-instrumentation for free.  The [ngrx/store-devtools](https://github.com/ngrx/store-devtools) module let's you track the state of your app at every message juncture.  Since all our effects are done through the ngrx-metabolism, we can benefit tremendously from the auto-logging.
 
