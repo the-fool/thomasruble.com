@@ -16,11 +16,11 @@ That *model-view-controller* design sure has staying power, doesn't it?  It's ea
 
 Consider two programs chained with the 'nix pipe: `cat | grep`.  Each program takes an input, operates on that input, and produces an output.  Can't get much simpler than this.  Now, 'MVC' is an **I/O process** by another name, smelling as sweet.  The *essential shape* of the input is the **model**, the *actual output* is the **view**, and all the processing that happens in between is the **controller**.  The model is the contract we make with our program's input, and the view is the contract we make with the program's output.  Now, 'controller' is kind of an overloaded word -- is control really what's at stake?  The **c** in MVC is really just an effectful function: it takes in a model, functions a little, and outputs.  It would be nice to name the pattern MVF(unction), or MVU(pdate) -- but that ship has sailed.
 
-**Redux** is just MVC all over again -- but *this time we mean business*.  Redux is the thought that, "Hey, it's not 'models-views-conrollers' -- it's just one of each!"  After all, an orthodox redux store is just *one function*, and the whole app state is modelled by *one type*.
+**Redux** is just MVC all over again -- but *this time we mean business*.  Redux is the thought that, "Hey, it's not 'models-views-conrollers' -- it's just one of each!"  After all, a redux reducer is just *one function*, and the whole app state is modelled by *one type*.
 
 ![mvc eye mouth brain](/img/mvc.png "Logo Title Text 1")
 
-It's a Cartesianism of sorts; design our program so it has a single constellation of sensory inputs, a single way to voice its results, and -- most importantly -- a single brain through which *everything* passes.
+It's a Cartesianism of sorts. Design our program so it has a single constellation of sensory inputs, a single way to voice its results, and -- most importantly -- a single brain through which *everything* passes.
 
 # Why use ngrx/effects?
 
