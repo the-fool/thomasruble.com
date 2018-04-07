@@ -1,16 +1,15 @@
 +++
-date = "2017-03-23T21:24:05-05:00"
+date = "2018-02-23T21:24:05-05:00"
 title = "ngrx/effects: why and when?"
 tags = ["redux", "ngrx", "angular", "spa"]
 description = "ngrx/effects offers a pattern to decouple our imperative side-effect code from our state-management strategy"
 keywords = ["ngrx", "effects", "redux", "angular"]
 +++
-
-# Abstract
+## Abstract
 
 Angular has `ngrx/store` & `ngrx/effects`.  When it comes to using `ngrx/store`, it seems the dust has settled on the virtue of a redux-esque store for state-management.  But I've noticed people still toeing the water with effect-management.  The following explores what's at stake, while using a classic Angular HTTP data-service as an example.  I'll show a way to rein in XHR stuff, and make code more reusable & composable.  Spoiler: `ngrx/effects` bestows great happiness and good fortune.
 
-# I mean . . . what *is* redux, *maaaann*?
+## I mean . . . what *is* redux, *maaaann*?
 
 That *model-view-controller* design sure has staying power, doesn't it?  It's easy to speculate why.  We know that separating concerns & isolating responsibilities makes code easier on the gulliver.  So let's go down to bedrock: what are the most *basic* responsibilities a program can be split into?
 
@@ -22,7 +21,7 @@ Consider two programs chained with the 'nix pipe: `cat | grep`.  Each program ta
 
 It's a Cartesianism of sorts. Design our program so it has a single constellation of sensory inputs, a single way to voice its results, and -- most importantly -- a single brain through which *everything* passes.
 
-# Why use ngrx/effects?
+## Why use ngrx/effects?
 
 To get in the mood, we must first ask:
 
@@ -50,16 +49,16 @@ Something like this:
 /* our singleton service */
 class WhaleService {
   whaleCache: Whale[] = [];
-  
+
   constructor(private http: Http) {}
-  
+
   public fetchWhales() {
     return this.http
       .get('/api/whales')
       .map(res => res.json())
-      .do(ws => {this.whaleCache = ws;}); 
+      .do(ws => {this.whaleCache = ws;});
     }
-    
+
     public get cache() {
       return [...this.whaleCache];
     }
@@ -72,7 +71,7 @@ class WhaleListView {
   constructor(whaleSvc: WhaleService) {
     whaleSvc.fetchWhales()
      .subcribe(ws => this.whales = ws)
-  } 
+  }
 }
 
 ```
@@ -81,7 +80,7 @@ Whoever wants the whales depends on getting the `WhaleService` injected, and the
 
 ## Good-new redux
 
-The `ngrx/store` keeps things nice and simple.  If a component needs Whales, it injects the `Store`.  If it needs Krill, it injects the `Store`. And so on.  Also, if it needs to feed krill to a whale, the `Store` is again sufficient.  
+The `ngrx/store` keeps things nice and simple.  If a component needs Whales, it injects the `Store`.  If it needs Krill, it injects the `Store`. And so on.  Also, if it needs to feed krill to a whale, the `Store` is again sufficient.
 
 ```typescript
 const { assoc } = require('ramda');
@@ -103,7 +102,6 @@ Dispatch a message `store.dispatch(new FeedWhales(krill))` and the update will t
 
 But how do we get new whales from our whale-api?
 
-
 ## Revenge of the Service
 
 Pure functions are nice, but sometimes our programs *do things* and *react to things done*. Making an XHR to a server is a prime example, since we both poke the outside world, and (almost) always look for it to poke us back.
@@ -123,9 +121,9 @@ class LoadWhalesSuccess {
 function reducer(whales: WhaleState, {type, payload}: Action): WhaleState {
   case 'LOAD_WHALES_SUCCESS':
     return [...payload];
-    
+
   /* . . . . */
-   
+
   default:
     return whales;
 }
@@ -141,7 +139,7 @@ class WhaleService {
     private http: Http,
     private store: Store<State>
   ) {}
-  
+
   public fetchWhales() {
     return this.http.get('/api/whales')
       .map(res => res.json())
@@ -165,7 +163,7 @@ class WhaleOfAView implements OnInit {
     const selector = (s: State) => s.whaleState;
     this.whales$ = store.select(selector);
   }
-  
+
   ngOnInit() {
     // go get 'em, service!
     this.whaleSvc
@@ -181,8 +179,7 @@ Not only that, but in order to get some fresh whale-data, someone needs to call 
 
 Not only that!  But! Our `WhaleService` itself is coupled with our `Store`!  If we change the `LoadWhales` messaging API with our `Store`, or get rid of it, we've got to make a change in the `WhaleService`, too.
 
-If only there was some way we could get declarative code, decoupled modules, and an orthogonal dependency archetecture . . . 
-
+If only there was some way we could get declarative code, decoupled modules, and an orthogonal dependency archetecture . . .
 
 ## Here is the ngrx/effects part
 
@@ -220,23 +217,24 @@ export class WhaleEffects {
     private actions$: Actions,
     private whaleSvc: WhaleService
   ) {
-  
+
   @Effect() loadWhales = this.actions$
     .ofType('LOAD_WHALES')
-    .switchMap(() => 
+    .switchMap(() =>
        this.whaleSvc
          .fetchWhales()
          .map(ws => new LoadWhalesSuccess(ws))
          .catch(er => of(new LoadWhalesError(er))));
   }
 ```
+
 If you haven't seen an `ngrx/effect` example before, let's quickly explain what's happening.  The `@Effect()` decorator gears a function into our `Store`-metabolism, so that when a message is dispatched, this function responds to it.  Just like a reducer.  The `ofType()` operator is a filter, which only lets certain events to continue down the chain.  This effect is only interested in the `'LOAD_WHALES'` message.  Now, an effect has a type signature: it must return an `Observable<Action>`.  This return gets unboxed in the `Store` and used in a fresh `store.dispatch()`.  So, we need to `.map()` our values into an `Action`, even if we're error-handling (hence the `of()` call, which returns an `Observable` from that `catch` block -- it's a little weird, c'est la vie).
 
 ![effects send messages](/img/effects.png "Logo Title Text 1")
 
 Back at it.
 
-The call to `WhaleService.fetchWhales()` happens deep within the nice, cozy confines of a managed pipeline.  It's boxed up, and other parts of our app don't even need to know it's there.  All they do is make a **declarative** request: `store.dispatch(new LoadWhales())`. 
+The call to `WhaleService.fetchWhales()` happens deep within the nice, cozy confines of a managed pipeline.  It's boxed up, and other parts of our app don't even need to know it's there.  All they do is make a **declarative** request: `store.dispatch(new LoadWhales())`.
 
 That is, our view now becomes:
 
@@ -248,7 +246,7 @@ class WhaleOfAView {
   ) {
     const selector = (s: State) => s.whaleState;
     this.whales$ = store.select(selector);
-    
+
     store.dispatch(new LoadWhales());
   }
 }
@@ -263,7 +261,7 @@ class WhaleService {
   constructor(
     private http: Http,
   ) {}
-  
+
   public fetchWhales() {
     return this.http.get('/api/whales')
       .map(res => res.json());
@@ -272,9 +270,6 @@ class WhaleService {
 ```
 
 Gone is the `Store`.  Our service has one role, which is marshalling data to-and-fro with a backend server.  This separation is doubly beneficial, since any change to our `Store` API does not require re-coding our `WhaleService` -- the service *knows nothing* about the `Store` implementation. Ha!
-
-
-
 
 ## The payoff
 

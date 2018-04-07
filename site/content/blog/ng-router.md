@@ -1,16 +1,15 @@
 +++
-date = "2017-04-02T21:24:05-05:00"
+date = "2018-03-22T21:24:05-05:00"
 title = "don't use angular's router"
 description = "Wrapping our Angular router code in an ngrx/effects module "
 tags = ["effects", "ngrx", "angular"]
 keywords = ["angular", "ngrx", "redux", "ngrx/effects", "spa"]
 +++
-
-# Abstract
+## Abstract
 
 *This little polemic assumes that you have a working knowledge of [ngrx/effects](https://github.com/ngrx/effects), and already embrace the Redux the lifestyle.   It just offers a neat `ngrx` pattern that improves app happiness.*
 
-Don't use Angular's built-in router.  At least, do not use it directly. 
+Don't use Angular's built-in router.  At least, do not use it directly.
 
 Let's say you have a zoo app, and you want to route to a detail view of the 77th weasel.  The typical way to do this is to call `router.navigate(['zoo', 'weasels', 77])` somewhere in your controller.   This type of imperative programming is bad for 3 reasons:
 
@@ -34,11 +33,11 @@ store.dispatch(msg);
 
 That is what we do in our component controller.  *The controller does not need to know anything about the implementation of our route change strategy*.  The route changes themselves, and all the logic they entail, will be taken care of by a bunch of functions registered with `ngrx/effect`.  These will make up our **route effect manager**:
 
-```
+```typescript
 import { go } from '@ngrx/router-store';
 
- . . . 
- 
+ . . .
+
  @Effect() gotoWeaselDetail = this.actions$
      .ofType('WEASEL_DETAIL')
      .map(msg => msg.payload)
@@ -47,8 +46,7 @@ import { go } from '@ngrx/router-store';
 
 We'll break down the details with complete code below.  Suffice it to say that we define the *implementation* of detailed weasel routes *once*, and everywhere else in the app we use our store's dispatcher as a stable *interface* for invoking these side-effects.  We get all the benefits of Redux and managed-effects, plus extremely DRY code -- and this because we abstain from using Angular's router!
 
-
-# What's the big deal?
+## What's the big deal?
 
 So long as code is correct, there are 2 other things that matter: efficiency and maintainability.  Give a developer 10 correct implementations of a program, what else is there to appraise them by besides speed and elegance?  The **routing manager** pattern is meant to improve code maintainability.
 
@@ -58,11 +56,11 @@ Like we said above, this ain't such a great way to do things.
 
   First, freely giving your code the power to initiate side-effects is asking for trouble.  A better way to handle side-effects is to place them inside an `ngrx/effect` manager.  This lets us keep track of them, and know the conditions under which they can happen.  We can also monitor every move our app makes through the excellent `redux-devtools` (hooked up thanks to `ngrx/store-devtools`).
 
-Second, _URL strings are an **implementation detail** of a **semantically** meaningful view_.  That is, we should be able to refer to our different views by meaningful names -- _not_ the URL string.  We should be free to change the string patterns in our URL scheme (or get rid of URL-based nav altogether!) and still have the same semantics with our app's route code.  Right?!  Haven't we all run into the problem where we decide to change our route-scheme, and then needed to hunt down and destroy dozens of incorrect `href=` strings  . . . 
+Second, _URL strings are an **implementation detail** of a **semantically** meaningful view_.  That is, we should be able to refer to our different views by meaningful names -- _not_ the URL string.  We should be free to change the string patterns in our URL scheme (or get rid of URL-based nav altogether!) and still have the same semantics with our app's route code.  Right?!  Haven't we all run into the problem where we decide to change our route-scheme, and then needed to hunt down and destroy dozens of incorrect `href=` strings  . . .
 
 Lastly, if we bring in route changes under the big tent of our `ngrx/store` message dispatcher, then we are that much closer to designing our app with a single unified internal API.  When you want to do something in your app, just dispatch a message to your store.  Embrace the opportunity for unity.
 
-# Code example
+## Code example
 
 The [@ngrx team](https://github.com/ngrx) have a collection of wrappers around common APIs and libraries.  One such wrapper is for Angular's router: the [router-store](https://github.com/ngrx/router-store).  This library exposes a variety of message constructors, the most straight-forward of which is the `go()` message constructor.  The arguments to `go()` follow the [definition](https://angular.io/docs/ts/latest/api/router/index/Router-class.html) of Angular's `router.navigate()` method very closely.  For the above route to the 77th weasel, we would construct a message like so:
 
@@ -96,7 +94,7 @@ export class RoutingEffects {
   constructor(
     private actions$: Actions,
   ) { }
-  
+
   @Effect() gotoWeasels = this.actions$
     .ofType('WEASEL_LIST')
     .map(() => weaselList());

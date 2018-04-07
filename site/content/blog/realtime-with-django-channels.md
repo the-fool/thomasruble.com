@@ -1,5 +1,5 @@
 +++
-date = "2017-04-12T21:24:05-05:00"
+date = "2017-09-12T21:24:05-05:00"
 title = "real-time progress updates with django channels"
 description = "Realtime progress updates through WebSockets with Django Channels"
 tags = ["channels", "websocket", "django"]
@@ -11,7 +11,6 @@ keywords = ["django", "channels", "websocket", "realtime", "websockets"]
 What follows is a simple demo for using the [Delay Server](https://channels.readthedocs.io/en/stable/delay.html) in [Django Channels](https://github.com/django/channels) to deliver asynchronous real-time progress updates over WebSockets.  Our demo backend will execute a long-running 'background task', and then send progress updates at regular intervals to a WebSocket client.  We'll also use channels to distribute our server load over multiple queues and worker processes.
 
 Full project code [here](https://github.com/the-fool/prog-rock)
-
 
 # Why Django Channels?
 
@@ -71,14 +70,14 @@ Alert: this example is going to use Docker and [docker-compose](https://docs.doc
 Since we're rocking real-time progress, let's name our app ProgRock.  Go ahead and clone the repo:
 
 ```bash
-$ git clone https://github.com/the-fool/prog-rock
+git clone https://github.com/the-fool/prog-rock
 ```
 
 Let's first look at the `requirements.txt` file.  There are some interesting Channels-specific thing in there.  They resulted from:
 
 ```bash
-$ pip install channels
-$ pip install asgi_redis
+pip install channels
+pip install asgi_redis
 ```
 
 The Channels package brings with it the [Daphne](https://github.com/django/daphne) server.  And we also needed to install `asgi_redis` because we are going to use [Redis](https://redis.io/) as our message-queue engine.
@@ -123,12 +122,12 @@ If you don't recognize the `rundelay` argument passed to `manage.py`, don't fret
 ```python
 INSTALLED_APPS = [
     . . .
-    
+
     # The Channels project apps
     'channels',
     'channels.delay',
-    
-    . . . 
+
+    . . .
 ]
 ```
 
