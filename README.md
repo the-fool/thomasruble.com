@@ -1,1 +1,11 @@
-I tried to do this from scratch, but jeez, Hugo is easy.
+# thomasruble.com
+
+## Build it
+
+To make a local docker image
+
+`./build-image.sh`
+
+## Dev serve it
+
+`./server.sh`
