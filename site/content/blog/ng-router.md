@@ -5,6 +5,8 @@ description = "Wrapping our Angular router code in an ngrx/effects module "
 tags = ["effects", "ngrx", "angular"]
 keywords = ["angular", "ngrx", "redux", "ngrx/effects", "spa"]
 +++
+<!-- markdownlint-disable MD002 MD041-->
+
 ## Abstract
 
 *This little polemic assumes that you have a working knowledge of [ngrx/effects](https://github.com/ngrx/effects), and already embrace the Redux the lifestyle.   It just offers a neat `ngrx` pattern that improves app happiness.*
