@@ -83,7 +83,7 @@ class Metronome:
 
 It's a simple change with big consequences.  It ensures that our callbacks will not block our thread while waiting on IO to complete.
 
-## 2. Prevent drift over the intervals
+## 2. Prevent drift over repeated intervals
 
 Making our callbacks asynchronous does not make them run faster.  The IO operations will still take time.  This time will create a drift in our metronome intervals, where one beat might take longer than another owing to how long it needed to wait for its callbacks to complete.  We need to keep track of the time it takes to run a beat's worth of callbacks to completion.  This is a simple enough feature to implement:
 
@@ -115,8 +115,39 @@ class Metronome:
 
       t1 = time.time()
 
-      # calc offset
+      # calculate offset
       offset = t1 - t0
 ```
 
 Now we are timing our callbacks, and reduce our sleep time accordingly.  This won't perfectly eliminate drift, but the minor variations between beats should be well within what a human ear can detect.
+
+## Example code
+
+Under the hood, our metronome is an infinite loop.  We can run this infinite loop in the midst of a single-threaded program because we utilize `asyncio.sleep()` in our metronome's loop, which frees up our thread to do other work while it is wating for the next beat.
+
+The `.start()` method of the metronome returns a *coroutine*.  This coroutine needs to be passed off to an `asyncio` event loop before it will run.  Here is a simple example usage:
+
+```python
+import asyncio
+from metronome import Metronome
+
+# define a callback
+async def do_beat():
+  print('BEAT')
+
+# collect all the metronome's callbacks
+cbs = [do_beat]
+
+# set tempo to 120 beats-per-minute
+tempo = 120
+
+# create the metronome
+metronome = Metronome(tempo=tempo, callbacks=cbs)
+
+# produce the coroutine
+metronome_coro = metronome.start()
+
+# asyncio boilerplate to run the coroutine
+loop = asyncio.get_event_loop()
+loop.run_until_complete(metronome_coro)
+```

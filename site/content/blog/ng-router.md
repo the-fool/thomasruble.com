@@ -5,7 +5,7 @@ description = "Wrapping our Angular router code in an ngrx/effects module "
 tags = ["effects", "ngrx", "angular"]
 keywords = ["angular", "ngrx", "redux", "ngrx/effects", "spa"]
 +++
-<!-- markdownlint-disable MD002 MD041-->
+<!-- markdownlint-disable MD002 MD026 MD041-->
 
 ## Abstract
 
