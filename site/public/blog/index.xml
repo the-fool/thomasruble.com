@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on The Fool</title>
+    <link>http://thomasruble.com/blog/</link>
+    <description>Recent content in Blog on The Fool</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 04 Apr 2018 21:24:05 -0500</lastBuildDate>
+    
+	<atom:link href="http://thomasruble.com/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>make a metronome with python asyncio</title>
+      <link>http://thomasruble.com/blog/make-a-metronome-with-python-asyncio/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/make-a-metronome-with-python-asyncio/</guid>
+      <description>What we will build We are going to make a metronome using Python&amp;rsquo;s asyncio module. Our metronome is going tick at a steady rate, executing a collection of subroutines at each tick. I&amp;rsquo;ve used this module to control a light &amp;amp; music show &amp;ndash; but you can use this code for running any operation at regular intervals. The code is relatively straight-forward &amp;ndash; I just think it&amp;rsquo;s a neat introdoction to the power of async IO!</description>
+    </item>
+    
+    <item>
+      <title>don&#39;t use angular&#39;s router</title>
+      <link>http://thomasruble.com/blog/dont-use-angulars-router/</link>
+      <pubDate>Thu, 22 Mar 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/dont-use-angulars-router/</guid>
+      <description>Abstract This little polemic assumes that you have a working knowledge of ngrx/effects, and already embrace the Redux the lifestyle. It just offers a neat ngrx pattern that improves app happiness.
+Don&amp;rsquo;t use Angular&amp;rsquo;s built-in router. At least, do not use it directly.
+Let&amp;rsquo;s say you have a zoo app, and you want to route to a detail view of the 77th weasel. The typical way to do this is to call router.</description>
+    </item>
+    
+    <item>
+      <title>ngrx/effects: why and when?</title>
+      <link>http://thomasruble.com/blog/ngrx/effects-why-and-when/</link>
+      <pubDate>Fri, 23 Feb 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/ngrx/effects-why-and-when/</guid>
+      <description>Abstract Angular has ngrx/store &amp;amp; ngrx/effects. When it comes to using ngrx/store, it seems the dust has settled on the virtue of a redux-esque store for state-management. But I&amp;rsquo;ve noticed people still toeing the water with effect-management. The following explores what&amp;rsquo;s at stake, while using a classic Angular HTTP data-service as an example. I&amp;rsquo;ll show a way to rein in XHR stuff, and make code more reusable &amp;amp; composable. Spoiler: ngrx/effects bestows great happiness and good fortune.</description>
+    </item>
+    
+    <item>
+      <title>real-time progress updates with django channels</title>
+      <link>http://thomasruble.com/blog/real-time-progress-updates-with-django-channels/</link>
+      <pubDate>Tue, 12 Sep 2017 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/real-time-progress-updates-with-django-channels/</guid>
+      <description>Abstract What follows is a simple demo for using the Delay Server in Django Channels to deliver asynchronous real-time progress updates over WebSockets. Our demo backend will execute a long-running &amp;lsquo;background task&amp;rsquo;, and then send progress updates at regular intervals to a WebSocket client. We&amp;rsquo;ll also use channels to distribute our server load over multiple queues and worker processes.
+Full project code here
+Why Django Channels? Not wat, but why.</description>
+    </item>
+    
+  </channel>
+</rss>

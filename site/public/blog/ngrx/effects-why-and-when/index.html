@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Mostly web">
+
+
+<meta property="og:site_name" content="The Fool" />
+<meta property="og:locale" content="nn_NO" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://thomasruble.com/blog/ngrx/effects-why-and-when/" />
+<meta property="og:title" content="ngrx/effects: why and when?" />
+<meta property="twitter:title" content="ngrx/effects: why and when?">
+
+    <meta property="og:image" content="http://thomasruble.com/img/banner.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:image" content="http://thomasruble.com/img/banner.png">
+
+<meta property="og:description" content="ngrx/effects offers a pattern to decouple our imperative side-effect code from our state-management strategy">
+<meta property="twitter:description" content="ngrx/effects offers a pattern to decouple our imperative side-effect code from our state-management strategy">
+
+<title>
+
+
+     The Fool - ngrx/effects: why and when? 
+
+</title>
+<link rel="canonical" href="http://thomasruble.com/blog/ngrx/effects-why-and-when/">
+
+
+<style media="screen">
+  @font-face {
+  font-family: 'Nexa Bold';
+  src: url('http://thomasruble.com/fonts/Nexa Bold.otf');
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, div.column {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+a,
+a:visited,
+a:focus,
+a:active {
+  text-decoration: none;
+}
+html {
+  height: 100%;
+  font-size: 16px;
+}
+body {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 100%;
+  font-weight: 400;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  color: #111111;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility !important;
+}
+.icon {
+  text-rendering: geometricPrecision !important;
+}
+section {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  width: 100%;
+}
+div.column {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  width: 100%;
+}
+.container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  width: 100%;
+}
+div.header .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+div.header .content {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.header .container .logo {
+  
+  max-width: 100px;
+  
+  margin-left: -2em;
+}
+div.header .name {
+  padding-top: 20px;
+  font-size: 28px;
+  font-family: 'Nexa Bold', 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  
+  text-transform: uppercase;
+  
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+}
+div.header nav {
+  margin-bottom: 16px;
+}
+div.header nav ul {
+  list-style: none;
+  text-align: center;
+  display: -webkit-inline-flex;
+  display: -moz-inline-flex;
+  display: -ms-inline-flexbox;
+  display: -ms-inline-flex;
+  display: inline-flex;
+}
+div.header nav ul li {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+div.header nav ul li:first-child {
+  margin-left: 0;
+}
+div.header nav ul li:last-child {
+  margin-right: 0;
+}
+div.header nav ul a {
+  color: #555555;
+  font-weight: 400;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  -webkit-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.header nav ul a:hover {
+  color: #111111;
+}
+div.footer .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  flex-direction: column-reverse;
+  width: 100%;
+  text-align: center;
+}
+div.footer .container a {
+  font-size: 14px;
+  margin-left: 6px;
+  margin-right: 6px;
+  opacity: 0.6;
+  -webkit-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.footer .container a:first-child {
+  margin-left: 0;
+}
+div.footer .container a:last-child {
+  margin-right: 0;
+}
+div.footer .container a:hover {
+  opacity: 0.8;
+}
+div.footer .container a .icon {
+  width: 16px;
+  height: 16px;
+}
+div.footer .container .copyright {
+  flex-grow: 0.5;
+  text-align: start;
+}
+div.footer .container .icons {
+  flex-grow: 0.5;
+  text-align: end;
+}
+div.main .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  justify-content: flex-start;
+}
+div.main .content {
+  color: #111111;
+  font-size: 16px;
+}
+div.main .content .title-container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  justify-content: space-between;
+}
+div.main .content .posts {
+  
+  
+}
+div.main .content .page-heading {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  text-transform: uppercase;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+  margin-bottom: 16px;
+}
+div.main .content .front-matter .page-heading {
+  margin-bottom: 0;
+}
+div.main .content .front-matter .meta {
+  font-size: 14px;
+  color: #666666;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  margin-bottom: 32px;
+}
+div.main .content .front-matter .date,
+div.main .content .front-matter .author,
+div.main .content .front-matter .tags,
+div.main .content .front-matter .word-count,
+div.main .content .front-matter .middot:before {
+  display: none;
+}
+div.main .content .front-matter .middot:before {
+  font-size: 6px;
+  margin: 0 6px;
+  vertical-align: middle;
+  content: "•";
+}
+div.main .content .front-matter .tags ul {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.main .content .front-matter .tags ul li {
+  -webkit-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.main .content .front-matter .tags ul li:hover {
+  opacity: 0.7;
+}
+div.main .content .front-matter .tags ul li a {
+  color: #666666;
+}
+div.main .container.f04 {
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+div.main .container.f04 .content {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.main .container.f04 .content .num {
+  margin: 30px 0px 30px 0;
+  font-weight: 400;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-size: 50px;
+}
+div.main .container.f04 .content .detail {
+  margin-bottom: 40px;
+}
+div.main .container .content .groupby {
+  margin-top: 1em;
+  padding-left: 0.5em;
+}
+div.main .container .content .post-item {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  display: list-item;
+  list-style: disc inside;
+}
+div.main .container .content .post-item .meta {
+  font-size: 14px;
+  color: #666666;
+  display: none;
+  min-width: 100px;
+}
+div.main .container .content .see-more {
+  font-style: italic;
+  float: right;
+  font-size: 0.9em;
+  margin-top: 2em;
+  color: #313537;
+}
+div.main .container .content .see-more:hover {
+  color: #666;
+}
+section {
+  padding: 0 16px;
+}
+div.column {
+  padding: 0 16px;
+}
+div.header {
+  padding-top: 10px;
+}
+div.header-home {
+  padding-top: 36px;
+}
+div.main {
+  padding-top: 32px;
+}
+div.main .container .content .post-item .meta {
+    display: block;
+}
+div.main .container .content .post-item {
+    display: flex;
+    list-style: none;
+}
+a {
+  color: #428bca;
+  -webkit-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+a:hover {
+  color: #2a6496;
+}
+img {
+  max-width: 100%;
+}
+div.main .content {
+    width: 100%;
+}
+div.main .content .markdown {
+  font-size: 1.1em;
+  line-height: 1.75em;
+  color: #313537;
+  font-family: serif;
+  font-weight: 300;
+}
+div.main .content .markdown h1,
+div.main .content .markdown h2,
+div.main .content .markdown h3,
+div.main .content .markdown h4,
+div.main .content .markdown h5,
+div.main .content .markdown h6 {
+  font-size: 22px;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  font-weight: 700;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+  text-transform: none;
+  margin-top: 1.75rem;
+}
+div.main .content .markdown h1 {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+}
+div.main .content .markdown h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+div.main .content .markdown h3 {
+  font-size: 1em;
+  margin-bottom: 1rem;
+}
+div.main .content .markdown h4,
+div.main .content .markdown h5,
+div.main .content .markdown h6 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  letter-spacing: none;
+}
+div.main .content .markdown code,
+div.main .content .markdown pre {
+  font-family: 'Menlo', monospace;
+  font-size: 0.98rem;
+  background-color: #f7f7f7;
+}
+div.main .content .markdown code {
+  /* enclosed by single backtick (`) */
+  padding: .15em .5em;
+  border-radius: 2px;
+}
+div.main .content .markdown pre {
+  /* Hugo specific: consider using the 'highlight' shortcode */
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  line-height: 1.5em;
+  white-space: pre;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+div.main .content .markdown pre code {
+  /* enclosed by 4 backticks (````) */
+  padding: 0;
+  font-size: 0.9rem;
+}
+div.main .content .markdown a code {
+  color: #428bca !important;
+}
+div.main .content .markdown a code:hover {
+  text-decoration: underline;
+}
+div.main .content .markdown p {
+  
+  text-align: justify;
+  
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+div.main .content .markdown ul,
+div.main .content .markdown ol,
+div.main .content .markdown dl {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+div.main .content .markdown dt {
+  font-weight: bold;
+}
+div.main .content .markdown dd {
+  margin-bottom: .5rem;
+}
+div.main .content .markdown ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-bottom: 1.25rem;
+}
+div.main .content .markdown ol {
+  list-style-type: decimal;
+  margin-bottom: 1.25rem;
+}
+div.main .content .markdown li {
+  margin-left: 2em;
+}
+div.main .content .markdown em {
+  font-style: italic;
+}
+div.main .content .markdown strong {
+  font-weight: 700;
+}
+div.main .content .markdown hr {
+  position: relative;
+  margin: 1.75rem 0;
+  border: 0;
+  border-top: 1px solid #808080;
+  border-top: 1px solid #999999;
+}
+div.main .content .markdown abbr {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #666666;
+  text-transform: uppercase;
+}
+div.main .content .markdown abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #808080;
+}
+div.main .content .markdown blockquote {
+  padding: .5rem 1rem;
+  margin: .8rem 0;
+  color: #7a7a7a;
+  border-left: .25rem solid #e5e5e5;
+}
+div.main .content .markdown blockquote p:last-child {
+  margin-bottom: 0;
+}
+div.main .content .markdown figure {
+  width: 100%;
+  background: #fff;
+  margin-bottom: 1em;
+}
+div.main .content .markdown figure img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+  position: static;
+  margin: auto;
+}
+div.main .content .markdown table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  border-collapse: collapse;
+}
+div.main .content .markdown td,
+div.main .content .markdown th {
+  padding: .25rem .5rem;
+  border: 1px solid #e5e5e5;
+}
+div.main .content .markdown tbody tr:nth-child(odd) td,
+div.main .content .markdown tbody tr:nth-child(odd) th {
+  background-color: #f7f7f7;
+}
+div.main .content .markdown .footnotes ol {
+  list-style-type: decimal;
+  margin-left: 16px;
+}
+div.main .content .markdown .footnotes li {
+  list-style-type: unset;
+}
+div.main .content .markdown .footnote-ref {
+  font-size: 0.7em;
+}
+div.main .content .navigation {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  padding: 2em;
+}
+div.main .content .navigation div {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  margin-top: 1em;
+}
+div.main .content .navigation .icon {
+  width: 16px;
+  height: 16px;
+}
+div.main .content .navigation a {
+  width: 250px;
+  margin: 0 1em;
+  text-align: center;
+  font-style: italic;
+  color: #313537;
+}
+div.main .content .share, div.main .content .share div {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  justify-content: center;
+}
+div.main .content .share {
+  background-color: rgba(152, 152, 152, 0.07);
+  padding: 1em 0;
+}
+div.main .content .share a {
+  margin: 0 6px;
+}
+kbd {
+  padding: 0.1em 0.6em;
+  border: 1px solid #ccc;
+  font-size: 11px;
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+  -moz-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 0 0.1em;
+  text-shadow: 0 1px 0 #fff;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Fonts */
+
+
+.wf-raleway-n4-active body, 
+.wf-raleway-n4-active div.header nav ul a,
+.wf-raleway-n7-active div.main .content .page-heading,
+.wf-raleway-n2-active div.main .container.f04 .content .num,
+.wf-raleway-n7-active div.main .content .markdown h1,
+.wf-raleway-n7-active div.main .content .markdown h2,
+.wf-raleway-n7-active div.main .content .markdown h3,
+.wf-raleway-n7-active div.main .content .markdown h4,
+.wf-raleway-n7-active div.main .content .markdown h5,
+.wf-raleway-n7-active div.main .content .markdown h6 {
+      font-family: 'Raleway';
+}
+
+.wf-merriweather-n3-active div.main .content .markdown {
+      font-family: 'Merriweather';
+}
+
+.wf-ubuntu-mono-n4-active div.main .content .markdown code,
+.wf-ubuntu-mono-n4-active div.main .content .markdown pre {
+      font-family: 'Ubuntu Mono';
+}
+
+
+</style>
+<style media="(min-width: 600px)">
+  body {
+-webkit-justify-content: center;
+-moz-justify-content: center;
+-ms-justify-content: center;
+justify-content: center;
+}
+.non-narrow.zero-top-spacing {
+padding-top: 0 !important;
+}
+section {
+padding: 0 16px;
+margin-left: 100px;
+margin-right: 100px;
+
+max-width: 750px;
+
+}
+div.column {
+padding: 0 16px;
+
+max-width: 750px;
+
+}
+div.header {
+background-color: transparent;
+}
+div.header .container {
+-webkit-justify-content: flex-start;
+-moz-justify-content: flex-start;
+-ms-justify-content: flex-start;
+justify-content: flex-start;
+}
+div.header .container .logo {
+margin: 0;
+}
+div.header-home .container .logo {
+max-width: 216px;
+margin-left: 24px;
+}
+div.header-home .name-home {
+padding-top: 30px;
+font-size: 40px;
+}
+div.header-home nav ul a {
+font-size: 18px;
+}
+div.header .content {
+-webkit-align-items: flex-start;
+-moz-align-items: flex-start;
+-ms-align-items: flex-start;
+align-items: flex-start;
+}
+div.header .name {
+color: #333333;
+}
+div.header nav {
+font-size: 14px;
+margin-bottom: 0;
+}
+div.header nav ul {
+text-align: left;
+}
+div.header nav ul a {
+color: #666666;
+}
+div.header nav ul a:hover {
+color: #333333;
+}
+div.footer {
+background-color: transparent;
+}
+div.footer .container {
+flex-direction: row;
+}
+div.footer .container a {
+margin-left: 3px;
+margin-right: 3px;
+color: #666666;
+}
+div.footer .container a:hover {
+color: #333333;
+}
+div.footer .container a .icon {
+font-size: 18px;
+}
+div.footer .container a .icon.larger {
+font-size: 20px;
+}
+div.main .content .front-matter .date,
+div.main .content .front-matter .author,
+div.main .content .front-matter .tags,
+div.main .content .front-matter .word-count,
+div.main .content .front-matter .middot:before {
+display: initial;
+}
+div.main .container.f04 {
+-webkit-justify-content: flex-start;
+-moz-justify-content: flex-start;
+-ms-justify-content: flex-start;
+justify-content: flex-start;
+}
+div.main .container.f04 .content {
+-webkit-align-items: flex-start;
+-moz-align-items: flex-start;
+-ms-align-items: flex-start;
+align-items: flex-start;
+}
+div.main .container.f04 .content .num {
+margin: 0 0 10px 0;
+font-size: 32px;
+}
+div.main .container.f04 .content .detail {
+margin-bottom: 30px;
+}
+.container {
+padding: 0 30px;
+}
+div.header {
+padding-top: 60px;
+padding-bottom: 60px;
+}
+div.footer {
+padding-top: 60px;
+padding-bottom: 60px;
+}
+div.main {
+padding-top: 0;
+}
+div.main .content {
+  
+  font-size: 16px;
+  
+}
+div.main .container .content .post-item {
+display: flex;
+list-style: none;
+padding-left: 1.5em;
+}
+div.main .container .content .post-item .meta {
+display: block;
+}
+div.main .content .markdown blockquote {
+padding-right: 5rem;
+padding-left: 1.25rem;
+}
+div.main .content .navigation {
+-webkit-flex-direction: row;
+-moz-flex-direction: row;
+-ms-flex-direction: row;
+flex-direction: row;
+}
+div.main .content .navigation div {
+margin-top: 0em;
+}
+
+</style>
+<style media="(min-width: 769px)">
+  div.main .content .markdown figure {
+width: 110%;
+margin-left: -4%;
+}
+div.main .content .markdown img {
+max-width: 110%;
+width: 110%;
+margin-left: -4%;
+}
+div.main .content .markdown pre {
+width: 110%;
+margin-left: -4%;
+}
+
+</style>
+
+<noscript>
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Merriweather:300,300i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700" rel="stylesheet">
+</noscript>
+
+
+  <style type="text/css" media="screen">
+    .hljs{display:block;background:white;padding:0.5em;color:#333333;overflow-x:auto}.hljs-comment,.hljs-meta{color:#969896}.hljs-string,.hljs-variable,.hljs-template-variable,.hljs-strong,.hljs-emphasis,.hljs-quote{color:#df5000}.hljs-keyword,.hljs-selector-tag,.hljs-type{color:#a71d5d}.hljs-literal,.hljs-symbol,.hljs-bullet,.hljs-attribute{color:#0086b3}.hljs-section,.hljs-name{color:#63a35c}.hljs-tag{color:#333333}.hljs-title,.hljs-attr,.hljs-selector-id,.hljs-selector-class,.hljs-selector-attr,.hljs-selector-pseudo{color:#795da3}.hljs-addition{color:#55a532;background-color:#eaffea}.hljs-deletion{color:#bd2c00;background-color:#ffecec}.hljs-link{text-decoration:underline}
+  </style>
+
+
+
+  <style type="text/css" media="screen">
+    .progressive{overflow:hidden;position:relative;background:#efefef}.progressive__img{width:100%;height:100%;position:absolute;-webkit-transform:translateZ(0);transform:translateZ(0)}.progressive--not-loaded{filter:blur(30px);-webkit-filter:blur(30px)}.progressive--is-loaded{filter:blur(20px);-webkit-filter:blur(20px);-webkit-animation:sharpen .5s both;animation:sharpen .5s both}@-webkit-keyframes sharpen{from{filter:blur(20px);-webkit-filter:blur(20px)}to{filter:blur(0);-webkit-filter:blur(0)}}@keyframes sharpen{from{filter:blur(20px);-webkit-filter:blur(20px)}to{filter:blur(0);-webkit-filter:blur(0)}}
+  </style>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="http://thomasruble.com/css/solarized-light.css">
+
+  <link rel="stylesheet" href="http://thomasruble.com/css/style.css">
+
+
+
+<link rel="shortcut icon"
+
+    href="http://thomasruble.com/img/logo.png"
+
+>
+
+
+
+
+</head>
+
+
+<body>
+
+
+<div class="header column">
+
+    <div class="container">
+        
+        <a href="http://thomasruble.com/"><img class="logo" src="http://thomasruble.com/img/foologo.png" alt="logo"></a>
+        
+        <div class="content">
+            <a href="http://thomasruble.com/"><div class="name"><h1>The Fool</h1></div></a>
+            <nav>
+                <ul>
+                    
+                            <li><a href="http://thomasruble.com/blog/">Blog</a></li>
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                            
+                            <li><a href="http://thomasruble.com/projects">projects</a></li>
+                            
+                        
+                    
+                    
+                        
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="main post non-narrow zero-top-spacing column">
+    <div class="container">
+        <div class="content">
+            <div class="front-matter">
+                <div class="title-container">
+                    <div class="page-heading">
+
+    
+    ngrx/effects: why and when?
+    
+
+</div>
+
+                </div>
+                <div class="meta">
+                    <div class="date" title="Fri Feb 23 2018 21:24:05 -0500">Feb 23, 2018</div>
+                    
+                        
+                    
+                    <div class="reading-time middot">11 minute read</div>
+                    <div class="tags">
+                        <ul>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/redux">redux</a> </li>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/ngrx">ngrx</a> </li>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/angular">angular</a> </li>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/spa">spa</a> </li>
+                          
+                        </ul>
+                    </div>
+                    <div class="tags">
+                        <ul>
+                          
+                          
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="markdown">
+                
+    
+    
+
+<h2 id="abstract">Abstract</h2>
+
+<p>Angular has <code>ngrx/store</code> &amp; <code>ngrx/effects</code>.  When it comes to using <code>ngrx/store</code>, it seems the dust has settled on the virtue of a redux-esque store for state-management.  But I&rsquo;ve noticed people still toeing the water with effect-management.  The following explores what&rsquo;s at stake, while using a classic Angular HTTP data-service as an example.  I&rsquo;ll show a way to rein in XHR stuff, and make code more reusable &amp; composable.  Spoiler: <code>ngrx/effects</code> bestows great happiness and good fortune.</p>
+
+<h2 id="i-mean-what-is-redux-maaaann">I mean &hellip; what <em>is</em> redux, <em>maaaann</em>?</h2>
+
+<p>That <em>model-view-controller</em> design sure has staying power, doesn&rsquo;t it?  It&rsquo;s easy to speculate why.  We know that separating concerns &amp; isolating responsibilities makes code easier on the gulliver.  So let&rsquo;s go down to bedrock: what are the most <em>basic</em> responsibilities a program can be split into?</p>
+
+<p>Consider two programs chained with the &lsquo;nix pipe: <code>cat | grep</code>.  Each program takes an input, operates on that input, and produces an output.  Can&rsquo;t get much simpler than this.  Now, &lsquo;MVC&rsquo; is an <strong>I/O process</strong> by another name, smelling as sweet.  The <em>essential shape</em> of the input is the <strong>model</strong>, the <em>actual output</em> is the <strong>view</strong>, and all the processing that happens in between is the <strong>controller</strong>.  The model is the contract we make with our program&rsquo;s input, and the view is the contract we make with the program&rsquo;s output.  Now, &lsquo;controller&rsquo; is kind of an overloaded word &ndash; is control really what&rsquo;s at stake?  The <strong>c</strong> in MVC is really just an effectful function: it takes in a model, functions a little, and outputs.  It would be nice to name the pattern MVF(unction), or MVU(pdate) &ndash; but that ship has sailed.</p>
+
+<p><strong>Redux</strong> is just MVC all over again &ndash; but <em>this time we mean business</em>.  Redux is the thought that, &ldquo;Hey, it&rsquo;s not &lsquo;models-views-conrollers&rsquo; &ndash; it&rsquo;s just one of each!&rdquo;  After all, a redux reducer is just <em>one function</em>, and the whole app state is modelled by <em>one type</em>.</p>
+
+<p><figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="http://thomasruble.com/img/mvc.png" src="http://thomasruble.com/img/low/mvc.png" alt="mvc eye mouth brain" title="Logo Title Text 1" /></p></figure>
+
+<p>It&rsquo;s a Cartesianism of sorts. Design our program so it has a single constellation of sensory inputs, a single way to voice its results, and &ndash; most importantly &ndash; a single brain through which <em>everything</em> passes.</p>
+
+<h2 id="why-use-ngrx-effects">Why use ngrx/effects?</h2>
+
+<p>To get in the mood, we must first ask:</p>
+
+<h2 id="what-s-the-deal-with-effects">What&rsquo;s the deal with effects?</h2>
+
+<p>It&rsquo;s easy to think of your redux store as just a way to update the state of your app.  After all, the most famous part of a store &ndash; The Reducer &ndash; is just a function that takes two arguments (a message, and a state) and returns a state.</p>
+
+<pre><code class="language-elm">type Reducer = (Message, State) -&gt; State
+</code></pre>
+
+<p>But this function definition does not tell the full story.  A lot goes on in a brain, even though we can&rsquo;t see it from the outside.  À propos our topic, the so-called &lsquo;store&rsquo; can also be the main conduit for all of our app&rsquo;s <em>side effects</em>.  What is a side-effect?  It&rsquo;s something that happens which could never be indicated by that function definition up above.  If an <code>http</code> call happens in the middle of a function call, does it make a sound?  Side-effects are secretive, sneaky things &ndash; they happen in the dark, outside of the reach of our type-definitions.</p>
+
+<p><figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="http://thomasruble.com/img/ghost.png" src="http://thomasruble.com/img/low/ghost.png" alt="side effect ghost" title="Logo Title Text 1" /></p></figure>
+
+<p>They haunt our functions &ndash; ethereal denizens of some astral plane beyond the sway of static type algebra.  But we can corral them, and maybe even leash them, if we bring them under the dominion of our ngrx/redux flow.</p>
+
+<h2 id="bad-old-angular">Bad-old Angular</h2>
+
+<p>Since the dawn of Angular, the prevailing technique has been to make a bunch of micro-mvc-lets out of <strong>services</strong>.  They would handle updating, storing, and exposing our state.  These &lsquo;services&rsquo; were a good fit, because they were guaranteed to be singletons within well-defined scopes.  We could stick bits of data in them, and get it back later.  We could also call <em>methods</em> on a service which could, for example, trigger an XHR request (side-effect) and then a view component could get the new data out of the service.</p>
+
+<p>Something like this:</p>
+
+<pre><code class="language-typescript">/* our singleton service */
+class WhaleService {
+  whaleCache: Whale[] = [];
+
+  constructor(private http: Http) {}
+
+  public fetchWhales() {
+    return this.http
+      .get('/api/whales')
+      .map(res =&gt; res.json())
+      .do(ws =&gt; {this.whaleCache = ws;});
+    }
+
+    public get cache() {
+      return [...this.whaleCache];
+    }
+}
+
+/* a needy view component somewhere */
+class WhaleListView {
+  whales: Whale[] = [];
+
+  constructor(whaleSvc: WhaleService) {
+    whaleSvc.fetchWhales()
+     .subcribe(ws =&gt; this.whales = ws)
+  }
+}
+
+</code></pre>
+
+<p>Whoever wants the whales depends on getting the <code>WhaleService</code> injected, and then can choose to snag the cache or call a method that triggers an XHR.  The service is the single source of truth for whales, and the gateway to the backend API in the great beyond.  True, we can gussy up our service with a public <code>rxjs/Subject</code>, which can emit values and save up from needing to make imperative calls on the service.  But that&rsquo;s not the issue we&rsquo;re here about.  The problem is that Whales are in their own module, with their own rules, getters, setters, etc &hellip; When we add Krill into the mix, we&rsquo;ll need a way to orchestrate updates between these two models.  Complexity will ensue.</p>
+
+<h2 id="good-new-redux">Good-new redux</h2>
+
+<p>The <code>ngrx/store</code> keeps things nice and simple.  If a component needs Whales, it injects the <code>Store</code>.  If it needs Krill, it injects the <code>Store</code>. And so on.  Also, if it needs to feed krill to a whale, the <code>Store</code> is again sufficient.</p>
+
+<pre><code class="language-typescript">const { assoc } = require('ramda');
+
+class FeedWhales {
+  readonly type = 'FEED';
+  constructor(public payload: Krill[]) {}
+}
+
+function reducer(whales: WhaleState, {type, payload}: Action): WhaleState {
+  case 'FEED':
+    return whales.map(assoc('krill', payload));
+  default:
+    return whales;
+}
+</code></pre>
+
+<p>Dispatch a message <code>store.dispatch(new FeedWhales(krill))</code> and the update will take care of itself in the reducer logic.  This takes care of our state management.  So far so good.</p>
+
+<p>But how do we get new whales from our whale-api?</p>
+
+<h2 id="revenge-of-the-service">Revenge of the Service</h2>
+
+<p>Pure functions are nice, but sometimes our programs <em>do things</em> and <em>react to things done</em>. Making an XHR to a server is a prime example, since we both poke the outside world, and (almost) always look for it to poke us back.</p>
+
+<p>A service (or <code>provider</code> if you like) is great for this.  They are the layer in app which is responsible for marhsalling data, and mapping commands to url endpoints.  All the special contracts with a remote server can be taken care of in our Angular service.  They encapsulate the bundling up of args into a <code>Request</code> and then the de-serializing of the response to some JS-friendly format (eg chaining <code>.map(res =&gt; res.json())</code>).</p>
+
+<p>The question is <em>how do we get data from our service into our</em> <code>Store</code>?</p>
+
+<p>Let&rsquo;s say our whale <code>reducer</code> had a <code>'LOAD'</code> action, which just replaced our <code>WhaleState</code> with a new list of whales:</p>
+
+<pre><code class="language-typescript">class LoadWhalesSuccess {
+  readonly type = 'LOAD_WHALES_SUCCESS';
+  constructor(public payload: Whale[]) {}
+}
+
+function reducer(whales: WhaleState, {type, payload}: Action): WhaleState {
+  case 'LOAD_WHALES_SUCCESS':
+    return [...payload];
+
+  /* . . . . */
+
+  default:
+    return whales;
+}
+</code></pre>
+
+<p>One way to use this reducer action in conjunction with XHR is to chain it our <code>WhaleService</code> method:</p>
+
+<pre><code class="language-typescript">/* our service, with no state management
+   it's just a proxy to a backend server */
+class WhaleService {
+  constructor(
+    private http: Http,
+    private store: Store&lt;State&gt;
+  ) {}
+
+  public fetchWhales() {
+    return this.http.get('/api/whales')
+      .map(res =&gt; res.json())
+      .do(ws =&gt; {
+        const msg = new LoadWhalesSuccess(ws);
+        this.store.dispatch(msg);
+       })
+  }
+}
+</code></pre>
+
+<p>In this case, a component that wants whales might do this:</p>
+
+<pre><code class="language-typescript">class WhaleOfAView implements OnInit {
+  whales$: Observable&lt;Whale[]&gt;;
+  constructor(
+    private store: Store&lt;State&gt;,
+    private whaleSvc: WhaleService
+  ) {
+    const selector = (s: State) =&gt; s.whaleState;
+    this.whales$ = store.select(selector);
+  }
+
+  ngOnInit() {
+    // go get 'em, service!
+    this.whaleSvc
+      .fetchWhales()
+      .subscribe();
+  }
+}
+</code></pre>
+
+<p>So much for only needing to inject <code>Store</code>. Now our view component not only need to know about how to get whales from the store, but it also needs to know to request whales from the backend.  It is coupled to our <code>WhaleService</code>.  Yikes!</p>
+
+<p>Not only that, but in order to get some fresh whale-data, someone needs to call a method on the whale service.  It doesn&rsquo;t matter if it&rsquo;s a <code>CanActivate</code> or <code>Resolve</code> guard, or the view <code>Component</code> itself &ndash; there is going to be a procedural stink with this setup.</p>
+
+<p>Not only that!  But! Our <code>WhaleService</code> itself is coupled with our <code>Store</code>!  If we change the <code>LoadWhales</code> messaging API with our <code>Store</code>, or get rid of it, we&rsquo;ve got to make a change in the <code>WhaleService</code>, too.</p>
+
+<p>If only there was some way we could get declarative code, decoupled modules, and an orthogonal dependency archetecture &hellip;</p>
+
+<h2 id="here-is-the-ngrx-effects-part">Here is the ngrx/effects part</h2>
+
+<p>Should our state be a function of side-effect tasks, or should those tasks be a function of state?  That is, should our <code>WhaleService</code> get called directly and trigger an update to state, or should the <code>WhaleService</code> stuff be subsumed in our store pipeline?  The second option, please.  The idea with using an <em>effects manager</em> is that our view components <em>do not call methods on services</em>.  In fact, all they end up doing is subscribing to our <code>Store</code> and dispatching messages to it.  The <code>Store</code> is responsible for making a subsequent call to <code>WhaleService</code>.</p>
+
+<p>We want our view component (or route guard, or whatever) to dispatch a message to the <code>Store</code>, and trust that the <code>Store</code> will take care of the necessary <code>WhaleService</code> calls.  What will happen is that the <code>WhaleService</code> is no longer a free agent, open for business throughout our app, but gets contained and owned by a managed effect-pipeline inside our ngrx-centered code.</p>
+
+<p>Here is what we do:</p>
+
+<pre><code class="language-typescript">/* the command to go get whales */
+class LoadWhales {
+  readonly type = 'LOAD_WHALES';
+  readonly payload = null;
+}
+
+/* fine-grain control of errors */
+class LoadWhalesError {
+  readonly type = 'LOAD_WHALES_ERROR';
+  constructor(public payload: any) {}
+}
+
+/* success message, with a payload of fresh whale */
+class LoadWhalesSuccess {
+  readonly type = 'LOAD_WHALES_SUCCESS';
+  constructor(public payload: Whale[]) {}
+}
+
+import { of } from 'rxjs/observable/of';
+import { Effect, Actions } from '@ngrx/effects';
+import { WhaleService } from 'whale.service';
+
+export class WhaleEffects {
+  constructor(
+    private actions$: Actions,
+    private whaleSvc: WhaleService
+  ) {
+
+  @Effect() loadWhales = this.actions$
+    .ofType('LOAD_WHALES')
+    .switchMap(() =&gt;
+       this.whaleSvc
+         .fetchWhales()
+         .map(ws =&gt; new LoadWhalesSuccess(ws))
+         .catch(er =&gt; of(new LoadWhalesError(er))));
+  }
+</code></pre>
+
+<p>If you haven&rsquo;t seen an <code>ngrx/effect</code> example before, let&rsquo;s quickly explain what&rsquo;s happening.  The <code>@Effect()</code> decorator gears a function into our <code>Store</code>-metabolism, so that when a message is dispatched, this function responds to it.  Just like a reducer.  The <code>ofType()</code> operator is a filter, which only lets certain events to continue down the chain.  This effect is only interested in the <code>'LOAD_WHALES'</code> message.  Now, an effect has a type signature: it must return an <code>Observable&lt;Action&gt;</code>.  This return gets unboxed in the <code>Store</code> and used in a fresh <code>store.dispatch()</code>.  So, we need to <code>.map()</code> our values into an <code>Action</code>, even if we&rsquo;re error-handling (hence the <code>of()</code> call, which returns an <code>Observable</code> from that <code>catch</code> block &ndash; it&rsquo;s a little weird, c&rsquo;est la vie).</p>
+
+<p><figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="http://thomasruble.com/img/effects.png" src="http://thomasruble.com/img/low/effects.png" alt="effects send messages" title="Logo Title Text 1" /></p></figure>
+
+<p>Back at it.</p>
+
+<p>The call to <code>WhaleService.fetchWhales()</code> happens deep within the nice, cozy confines of a managed pipeline.  It&rsquo;s boxed up, and other parts of our app don&rsquo;t even need to know it&rsquo;s there.  All they do is make a <strong>declarative</strong> request: <code>store.dispatch(new LoadWhales())</code>.</p>
+
+<p>That is, our view now becomes:</p>
+
+<pre><code class="language-typescript">class WhaleOfAView {
+  whales$: Observable&lt;Whale[]&gt;;
+  constructor(
+    private store: Store&lt;State&gt;,
+  ) {
+    const selector = (s: State) =&gt; s.whaleState;
+    this.whales$ = store.select(selector);
+
+    store.dispatch(new LoadWhales());
+  }
+}
+</code></pre>
+
+<p>Gone is the service.  Just dispatch a message, and then: BAM!  New whales appear.  If we ever change our service, or ditch it, then we only need to make chages in the <em>effect</em> pipelines that use it &ndash; and since these pipelines are reusable and composable, there probably won&rsquo;t be many.</p>
+
+<p>And our service becomes:</p>
+
+<pre><code class="language-typescript">class WhaleService {
+  constructor(
+    private http: Http,
+  ) {}
+
+  public fetchWhales() {
+    return this.http.get('/api/whales')
+      .map(res =&gt; res.json());
+  }
+}
+</code></pre>
+
+<p>Gone is the <code>Store</code>.  Our service has one role, which is marshalling data to-and-fro with a backend server.  This separation is doubly beneficial, since any change to our <code>Store</code> API does not require re-coding our <code>WhaleService</code> &ndash; the service <em>knows nothing</em> about the <code>Store</code> implementation. Ha!</p>
+
+<h2 id="the-payoff">The payoff</h2>
+
+<p>So, our data-services don&rsquo;t need to know about the implementation of our <code>Store</code>, and our view components don&rsquo;t need to know about the implementation of our data-services.  This responsibility got passed up to the <code>Store</code>.  But this is more than just a shell game.  Just as how grouping all state-management into one domain gives us code-joy, so does grouping our effect management.  Once we step outside of the land of trivial examples into a regular complicated app, we can avail ourselves of the fact that all our effects take place in <code>Observable</code> pipelines, which means we can compose &lsquo;em all.</p>
+
+<p>But that&rsquo;s not all &ndash; since an <code>ngrx</code> <code>@Effect</code> function can return an <code>Action</code>, the effects can daisy-chain on each other.  For example, there could be another effect listening to type <code>'LOAD_WHALE_ERROR'</code> which sends an XHR to some error-logger on another service.  No matter what effectul feature you need, you can do it by chaining &amp; composing these things.</p>
+
+<p><figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="http://thomasruble.com/img/one.png" src="http://thomasruble.com/img/low/one.png" alt="The One" title="Logo Title Text 1" /></p></figure>
+
+<p>We are doing MVC the right way &ndash; with a single Brain/Controller/Updater thing.  It provides a <strong>unified</strong> and <strong>declarative</strong> interface for the whole rest of our app code.  We don&rsquo;t call methods on a multitude of services, we just dispatch messages and subscribe to events through a single gateway.  Our app is gathered together through one pattern that manages both our state and our effects.</p>
+
+<p>It&rsquo;s also worth adding that <code>ngrx</code> (and redux) have great tooling, which includes code-instrumentation for free.  The <a href="https://github.com/ngrx/store-devtools">ngrx/store-devtools</a> module let&rsquo;s you track the state of your app at every message juncture.  Since all our effects are done through the ngrx-metabolism, we can benefit tremendously from the auto-logging.</p>
+
+<p>Now go forth and effect!</p>
+
+
+            </div>
+            
+            
+            
+
+            
+
+            
+        </div>
+    </div>
+</div>
+
+
+
+<div class="footer column">
+    <div class="container">
+
+        
+
+        <div class="copyright">
+
+        
+            
+                <a href="http://thomasruble.com/license">Copyright © 2018 Thomas Ruble</a>
+            
+        
+
+        </div>
+        <div class="icons">
+
+        
+
+        
+
+        
+
+        
+
+        
+            <a href="https://github.com/the-fool" target="_blank">
+                <img class="icon" src="http://thomasruble.com/img/github.svg" alt="github" />
+            </a>
+        
+
+        
+
+        
+            <a href="https://www.linkedin.com/in/thomas-ruble-307b65106" target="_blank">
+                <img class="icon" src="http://thomasruble.com/img/linkedin.svg" alt="linkedin" />
+            </a>
+        
+
+        
+
+        
+            <a href="mailto:tr@thomasruble.com">
+                <img class="icon" src="http://thomasruble.com/img/email.svg" alt="email" />
+            </a>
+        
+
+        
+            <a href="http://thomasruble.com/index.xml">
+                <img class="icon" src="http://thomasruble.com/img/rss.svg" alt="rss" />
+            </a>
+        
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    google: {
+      families: ['Raleway:400,600,700', 'Merriweather:300,300i,700,700i', 'Ubuntu+Mono:400,700']
+    }
+  });
+</script>
+
+
+
+  <script src="http://thomasruble.com/js/highlight.min.js" defer></script>
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/elm.min.js" defer></script>
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/typescript.min.js" defer></script>
+  
+
+
+
+  <script src="http://thomasruble.com/js/progressively.min.js" defer></script>
+
+
+
+
+
+
+
+
+<script>
+  window.onload = function() {
+    
+      hljs.initHighlighting();
+    
+    
+      progressively.init({delay: 30, throttle: 50});
+    
+    
+  };
+</script>
+
+
+
+
+</body>
+</html>
+

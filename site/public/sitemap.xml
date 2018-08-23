@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://thomasruble.com/blog/make-a-metronome-with-python-asyncio/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/blog/dont-use-angulars-router/</loc>
+    <lastmod>2018-03-22T21:24:05-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/projects/organisynth/</loc>
+    <lastmod>2018-03-10T20:29:37-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/blog/ngrx/effects-why-and-when/</loc>
+    <lastmod>2018-02-23T21:24:05-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/blog/real-time-progress-updates-with-django-channels/</loc>
+    <lastmod>2017-09-12T21:24:05-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/projects/elm-brain/</loc>
+    <lastmod>2017-03-19T20:29:37-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/angular/</loc>
+    <lastmod>2018-03-22T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/async/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/asyncio/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/blog/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/channels/</loc>
+    <lastmod>2017-09-12T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/django/</loc>
+    <lastmod>2017-09-12T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/effects/</loc>
+    <lastmod>2018-03-22T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/license/</loc>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/midi/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/music/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/ngrx/</loc>
+    <lastmod>2018-03-22T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/projects/</loc>
+    <lastmod>2018-03-10T20:29:37-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/python/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/redux/</loc>
+    <lastmod>2018-02-23T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/spa/</loc>
+    <lastmod>2018-02-23T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/</loc>
+    <lastmod>2018-03-22T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/</loc>
+    <lastmod>2018-04-04T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://thomasruble.com/tags/websocket/</loc>
+    <lastmod>2017-09-12T21:24:05-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

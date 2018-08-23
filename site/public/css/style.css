@@ -1,0 +1,22 @@
+body {
+  background: #fffcf6;
+}
+
+section.header .content {
+  margin-left: 1rem;
+}
+
+section.main .content .markdown pre {
+  padding: 0 !important;
+}
+section.main .content .markdown pre code {
+  padding: 0.8rem;
+}
+
+section.main .content .markdown figure {
+  background: transparent;
+}
+
+p code {
+  background: #fdf6e3;
+}

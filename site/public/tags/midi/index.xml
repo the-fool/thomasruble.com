@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Midi on The Fool</title>
+    <link>http://thomasruble.com/tags/midi/</link>
+    <description>Recent content in Midi on The Fool</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 04 Apr 2018 21:24:05 -0500</lastBuildDate>
+    
+	<atom:link href="http://thomasruble.com/tags/midi/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>make a metronome with python asyncio</title>
+      <link>http://thomasruble.com/blog/make-a-metronome-with-python-asyncio/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/make-a-metronome-with-python-asyncio/</guid>
+      <description>What we will build We are going to make a metronome using Python&amp;rsquo;s asyncio module. Our metronome is going tick at a steady rate, executing a collection of subroutines at each tick. I&amp;rsquo;ve used this module to control a light &amp;amp; music show &amp;ndash; but you can use this code for running any operation at regular intervals. The code is relatively straight-forward &amp;ndash; I just think it&amp;rsquo;s a neat introdoction to the power of async IO!</description>
+    </item>
+    
+  </channel>
+</rss>

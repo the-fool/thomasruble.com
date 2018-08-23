@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ngrx on The Fool</title>
+    <link>http://thomasruble.com/tags/ngrx/</link>
+    <description>Recent content in Ngrx on The Fool</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Thu, 22 Mar 2018 21:24:05 -0500</lastBuildDate>
+    
+	<atom:link href="http://thomasruble.com/tags/ngrx/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>don&#39;t use angular&#39;s router</title>
+      <link>http://thomasruble.com/blog/dont-use-angulars-router/</link>
+      <pubDate>Thu, 22 Mar 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/dont-use-angulars-router/</guid>
+      <description>Abstract This little polemic assumes that you have a working knowledge of ngrx/effects, and already embrace the Redux the lifestyle. It just offers a neat ngrx pattern that improves app happiness.
+Don&amp;rsquo;t use Angular&amp;rsquo;s built-in router. At least, do not use it directly.
+Let&amp;rsquo;s say you have a zoo app, and you want to route to a detail view of the 77th weasel. The typical way to do this is to call router.</description>
+    </item>
+    
+    <item>
+      <title>ngrx/effects: why and when?</title>
+      <link>http://thomasruble.com/blog/ngrx/effects-why-and-when/</link>
+      <pubDate>Fri, 23 Feb 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/blog/ngrx/effects-why-and-when/</guid>
+      <description>Abstract Angular has ngrx/store &amp;amp; ngrx/effects. When it comes to using ngrx/store, it seems the dust has settled on the virtue of a redux-esque store for state-management. But I&amp;rsquo;ve noticed people still toeing the water with effect-management. The following explores what&amp;rsquo;s at stake, while using a classic Angular HTTP data-service as an example. I&amp;rsquo;ll show a way to rein in XHR stuff, and make code more reusable &amp;amp; composable. Spoiler: ngrx/effects bestows great happiness and good fortune.</description>
+    </item>
+    
+  </channel>
+</rss>

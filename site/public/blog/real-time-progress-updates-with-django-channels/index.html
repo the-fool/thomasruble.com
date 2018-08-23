@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+<meta charset="utf-8">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Mostly web">
+
+
+<meta property="og:site_name" content="The Fool" />
+<meta property="og:locale" content="nn_NO" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://thomasruble.com/blog/real-time-progress-updates-with-django-channels/" />
+<meta property="og:title" content="real-time progress updates with django channels" />
+<meta property="twitter:title" content="real-time progress updates with django channels">
+
+    <meta property="og:image" content="http://thomasruble.com/img/banner.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:image" content="http://thomasruble.com/img/banner.png">
+
+<meta property="og:description" content="Realtime progress updates through WebSockets with Django Channels">
+<meta property="twitter:description" content="Realtime progress updates through WebSockets with Django Channels">
+
+<title>
+
+
+     The Fool - real-time progress updates with django channels 
+
+</title>
+<link rel="canonical" href="http://thomasruble.com/blog/real-time-progress-updates-with-django-channels/">
+
+
+<style media="screen">
+  @font-face {
+  font-family: 'Nexa Bold';
+  src: url('http://thomasruble.com/fonts/Nexa Bold.otf');
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, div.column {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+a,
+a:visited,
+a:focus,
+a:active {
+  text-decoration: none;
+}
+html {
+  height: 100%;
+  font-size: 16px;
+}
+body {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 100%;
+  font-weight: 400;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  color: #111111;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility !important;
+}
+.icon {
+  text-rendering: geometricPrecision !important;
+}
+section {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  width: 100%;
+}
+div.column {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  width: 100%;
+}
+.container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  width: 100%;
+}
+div.header .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+div.header .content {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.header .container .logo {
+  
+  max-width: 100px;
+  
+  margin-left: -2em;
+}
+div.header .name {
+  padding-top: 20px;
+  font-size: 28px;
+  font-family: 'Nexa Bold', 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  
+  text-transform: uppercase;
+  
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+}
+div.header nav {
+  margin-bottom: 16px;
+}
+div.header nav ul {
+  list-style: none;
+  text-align: center;
+  display: -webkit-inline-flex;
+  display: -moz-inline-flex;
+  display: -ms-inline-flexbox;
+  display: -ms-inline-flex;
+  display: inline-flex;
+}
+div.header nav ul li {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+div.header nav ul li:first-child {
+  margin-left: 0;
+}
+div.header nav ul li:last-child {
+  margin-right: 0;
+}
+div.header nav ul a {
+  color: #555555;
+  font-weight: 400;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  -webkit-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.header nav ul a:hover {
+  color: #111111;
+}
+div.footer .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+  flex-direction: column-reverse;
+  width: 100%;
+  text-align: center;
+}
+div.footer .container a {
+  font-size: 14px;
+  margin-left: 6px;
+  margin-right: 6px;
+  opacity: 0.6;
+  -webkit-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.footer .container a:first-child {
+  margin-left: 0;
+}
+div.footer .container a:last-child {
+  margin-right: 0;
+}
+div.footer .container a:hover {
+  opacity: 0.8;
+}
+div.footer .container a .icon {
+  width: 16px;
+  height: 16px;
+}
+div.footer .container .copyright {
+  flex-grow: 0.5;
+  text-align: start;
+}
+div.footer .container .icons {
+  flex-grow: 0.5;
+  text-align: end;
+}
+div.main .container {
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  justify-content: flex-start;
+}
+div.main .content {
+  color: #111111;
+  font-size: 16px;
+}
+div.main .content .title-container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  justify-content: space-between;
+}
+div.main .content .posts {
+  
+  
+}
+div.main .content .page-heading {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  text-transform: uppercase;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+  margin-bottom: 16px;
+}
+div.main .content .front-matter .page-heading {
+  margin-bottom: 0;
+}
+div.main .content .front-matter .meta {
+  font-size: 14px;
+  color: #666666;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  margin-bottom: 32px;
+}
+div.main .content .front-matter .date,
+div.main .content .front-matter .author,
+div.main .content .front-matter .tags,
+div.main .content .front-matter .word-count,
+div.main .content .front-matter .middot:before {
+  display: none;
+}
+div.main .content .front-matter .middot:before {
+  font-size: 6px;
+  margin: 0 6px;
+  vertical-align: middle;
+  content: "•";
+}
+div.main .content .front-matter .tags ul {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.main .content .front-matter .tags ul li {
+  -webkit-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: opacity 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+div.main .content .front-matter .tags ul li:hover {
+  opacity: 0.7;
+}
+div.main .content .front-matter .tags ul li a {
+  color: #666666;
+}
+div.main .container.f04 {
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+div.main .container.f04 .content {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+div.main .container.f04 .content .num {
+  margin: 30px 0px 30px 0;
+  font-weight: 400;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-size: 50px;
+}
+div.main .container.f04 .content .detail {
+  margin-bottom: 40px;
+}
+div.main .container .content .groupby {
+  margin-top: 1em;
+  padding-left: 0.5em;
+}
+div.main .container .content .post-item {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  display: list-item;
+  list-style: disc inside;
+}
+div.main .container .content .post-item .meta {
+  font-size: 14px;
+  color: #666666;
+  display: none;
+  min-width: 100px;
+}
+div.main .container .content .see-more {
+  font-style: italic;
+  float: right;
+  font-size: 0.9em;
+  margin-top: 2em;
+  color: #313537;
+}
+div.main .container .content .see-more:hover {
+  color: #666;
+}
+section {
+  padding: 0 16px;
+}
+div.column {
+  padding: 0 16px;
+}
+div.header {
+  padding-top: 10px;
+}
+div.header-home {
+  padding-top: 36px;
+}
+div.main {
+  padding-top: 32px;
+}
+div.main .container .content .post-item .meta {
+    display: block;
+}
+div.main .container .content .post-item {
+    display: flex;
+    list-style: none;
+}
+a {
+  color: #428bca;
+  -webkit-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -moz-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -ms-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+  -o-transition: color 0.1s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
+a:hover {
+  color: #2a6496;
+}
+img {
+  max-width: 100%;
+}
+div.main .content {
+    width: 100%;
+}
+div.main .content .markdown {
+  font-size: 1.1em;
+  line-height: 1.75em;
+  color: #313537;
+  font-family: serif;
+  font-weight: 300;
+}
+div.main .content .markdown h1,
+div.main .content .markdown h2,
+div.main .content .markdown h3,
+div.main .content .markdown h4,
+div.main .content .markdown h5,
+div.main .content .markdown h6 {
+  font-size: 22px;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.005rem;
+  font-weight: 700;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  color: #333333;
+  text-transform: none;
+  margin-top: 1.75rem;
+}
+div.main .content .markdown h1 {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+}
+div.main .content .markdown h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+div.main .content .markdown h3 {
+  font-size: 1em;
+  margin-bottom: 1rem;
+}
+div.main .content .markdown h4,
+div.main .content .markdown h5,
+div.main .content .markdown h6 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  letter-spacing: none;
+}
+div.main .content .markdown code,
+div.main .content .markdown pre {
+  font-family: 'Menlo', monospace;
+  font-size: 0.98rem;
+  background-color: #f7f7f7;
+}
+div.main .content .markdown code {
+  /* enclosed by single backtick (`) */
+  padding: .15em .5em;
+  border-radius: 2px;
+}
+div.main .content .markdown pre {
+  /* Hugo specific: consider using the 'highlight' shortcode */
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  line-height: 1.5em;
+  white-space: pre;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+div.main .content .markdown pre code {
+  /* enclosed by 4 backticks (````) */
+  padding: 0;
+  font-size: 0.9rem;
+}
+div.main .content .markdown a code {
+  color: #428bca !important;
+}
+div.main .content .markdown a code:hover {
+  text-decoration: underline;
+}
+div.main .content .markdown p {
+  
+  text-align: justify;
+  
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+div.main .content .markdown ul,
+div.main .content .markdown ol,
+div.main .content .markdown dl {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+div.main .content .markdown dt {
+  font-weight: bold;
+}
+div.main .content .markdown dd {
+  margin-bottom: .5rem;
+}
+div.main .content .markdown ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-bottom: 1.25rem;
+}
+div.main .content .markdown ol {
+  list-style-type: decimal;
+  margin-bottom: 1.25rem;
+}
+div.main .content .markdown li {
+  margin-left: 2em;
+}
+div.main .content .markdown em {
+  font-style: italic;
+}
+div.main .content .markdown strong {
+  font-weight: 700;
+}
+div.main .content .markdown hr {
+  position: relative;
+  margin: 1.75rem 0;
+  border: 0;
+  border-top: 1px solid #808080;
+  border-top: 1px solid #999999;
+}
+div.main .content .markdown abbr {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #666666;
+  text-transform: uppercase;
+}
+div.main .content .markdown abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #808080;
+}
+div.main .content .markdown blockquote {
+  padding: .5rem 1rem;
+  margin: .8rem 0;
+  color: #7a7a7a;
+  border-left: .25rem solid #e5e5e5;
+}
+div.main .content .markdown blockquote p:last-child {
+  margin-bottom: 0;
+}
+div.main .content .markdown figure {
+  width: 100%;
+  background: #fff;
+  margin-bottom: 1em;
+}
+div.main .content .markdown figure img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+  position: static;
+  margin: auto;
+}
+div.main .content .markdown table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  border-collapse: collapse;
+}
+div.main .content .markdown td,
+div.main .content .markdown th {
+  padding: .25rem .5rem;
+  border: 1px solid #e5e5e5;
+}
+div.main .content .markdown tbody tr:nth-child(odd) td,
+div.main .content .markdown tbody tr:nth-child(odd) th {
+  background-color: #f7f7f7;
+}
+div.main .content .markdown .footnotes ol {
+  list-style-type: decimal;
+  margin-left: 16px;
+}
+div.main .content .markdown .footnotes li {
+  list-style-type: unset;
+}
+div.main .content .markdown .footnote-ref {
+  font-size: 0.7em;
+}
+div.main .content .navigation {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  padding: 2em;
+}
+div.main .content .navigation div {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  margin-top: 1em;
+}
+div.main .content .navigation .icon {
+  width: 16px;
+  height: 16px;
+}
+div.main .content .navigation a {
+  width: 250px;
+  margin: 0 1em;
+  text-align: center;
+  font-style: italic;
+  color: #313537;
+}
+div.main .content .share, div.main .content .share div {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  justify-content: center;
+}
+div.main .content .share {
+  background-color: rgba(152, 152, 152, 0.07);
+  padding: 1em 0;
+}
+div.main .content .share a {
+  margin: 0 6px;
+}
+kbd {
+  padding: 0.1em 0.6em;
+  border: 1px solid #ccc;
+  font-size: 11px;
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+  -moz-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 0 0.1em;
+  text-shadow: 0 1px 0 #fff;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Fonts */
+
+
+.wf-raleway-n4-active body, 
+.wf-raleway-n4-active div.header nav ul a,
+.wf-raleway-n7-active div.main .content .page-heading,
+.wf-raleway-n2-active div.main .container.f04 .content .num,
+.wf-raleway-n7-active div.main .content .markdown h1,
+.wf-raleway-n7-active div.main .content .markdown h2,
+.wf-raleway-n7-active div.main .content .markdown h3,
+.wf-raleway-n7-active div.main .content .markdown h4,
+.wf-raleway-n7-active div.main .content .markdown h5,
+.wf-raleway-n7-active div.main .content .markdown h6 {
+      font-family: 'Raleway';
+}
+
+.wf-merriweather-n3-active div.main .content .markdown {
+      font-family: 'Merriweather';
+}
+
+.wf-ubuntu-mono-n4-active div.main .content .markdown code,
+.wf-ubuntu-mono-n4-active div.main .content .markdown pre {
+      font-family: 'Ubuntu Mono';
+}
+
+
+</style>
+<style media="(min-width: 600px)">
+  body {
+-webkit-justify-content: center;
+-moz-justify-content: center;
+-ms-justify-content: center;
+justify-content: center;
+}
+.non-narrow.zero-top-spacing {
+padding-top: 0 !important;
+}
+section {
+padding: 0 16px;
+margin-left: 100px;
+margin-right: 100px;
+
+max-width: 750px;
+
+}
+div.column {
+padding: 0 16px;
+
+max-width: 750px;
+
+}
+div.header {
+background-color: transparent;
+}
+div.header .container {
+-webkit-justify-content: flex-start;
+-moz-justify-content: flex-start;
+-ms-justify-content: flex-start;
+justify-content: flex-start;
+}
+div.header .container .logo {
+margin: 0;
+}
+div.header-home .container .logo {
+max-width: 216px;
+margin-left: 24px;
+}
+div.header-home .name-home {
+padding-top: 30px;
+font-size: 40px;
+}
+div.header-home nav ul a {
+font-size: 18px;
+}
+div.header .content {
+-webkit-align-items: flex-start;
+-moz-align-items: flex-start;
+-ms-align-items: flex-start;
+align-items: flex-start;
+}
+div.header .name {
+color: #333333;
+}
+div.header nav {
+font-size: 14px;
+margin-bottom: 0;
+}
+div.header nav ul {
+text-align: left;
+}
+div.header nav ul a {
+color: #666666;
+}
+div.header nav ul a:hover {
+color: #333333;
+}
+div.footer {
+background-color: transparent;
+}
+div.footer .container {
+flex-direction: row;
+}
+div.footer .container a {
+margin-left: 3px;
+margin-right: 3px;
+color: #666666;
+}
+div.footer .container a:hover {
+color: #333333;
+}
+div.footer .container a .icon {
+font-size: 18px;
+}
+div.footer .container a .icon.larger {
+font-size: 20px;
+}
+div.main .content .front-matter .date,
+div.main .content .front-matter .author,
+div.main .content .front-matter .tags,
+div.main .content .front-matter .word-count,
+div.main .content .front-matter .middot:before {
+display: initial;
+}
+div.main .container.f04 {
+-webkit-justify-content: flex-start;
+-moz-justify-content: flex-start;
+-ms-justify-content: flex-start;
+justify-content: flex-start;
+}
+div.main .container.f04 .content {
+-webkit-align-items: flex-start;
+-moz-align-items: flex-start;
+-ms-align-items: flex-start;
+align-items: flex-start;
+}
+div.main .container.f04 .content .num {
+margin: 0 0 10px 0;
+font-size: 32px;
+}
+div.main .container.f04 .content .detail {
+margin-bottom: 30px;
+}
+.container {
+padding: 0 30px;
+}
+div.header {
+padding-top: 60px;
+padding-bottom: 60px;
+}
+div.footer {
+padding-top: 60px;
+padding-bottom: 60px;
+}
+div.main {
+padding-top: 0;
+}
+div.main .content {
+  
+  font-size: 16px;
+  
+}
+div.main .container .content .post-item {
+display: flex;
+list-style: none;
+padding-left: 1.5em;
+}
+div.main .container .content .post-item .meta {
+display: block;
+}
+div.main .content .markdown blockquote {
+padding-right: 5rem;
+padding-left: 1.25rem;
+}
+div.main .content .navigation {
+-webkit-flex-direction: row;
+-moz-flex-direction: row;
+-ms-flex-direction: row;
+flex-direction: row;
+}
+div.main .content .navigation div {
+margin-top: 0em;
+}
+
+</style>
+<style media="(min-width: 769px)">
+  div.main .content .markdown figure {
+width: 110%;
+margin-left: -4%;
+}
+div.main .content .markdown img {
+max-width: 110%;
+width: 110%;
+margin-left: -4%;
+}
+div.main .content .markdown pre {
+width: 110%;
+margin-left: -4%;
+}
+
+</style>
+
+<noscript>
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,600,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Merriweather:300,300i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700" rel="stylesheet">
+</noscript>
+
+
+  <style type="text/css" media="screen">
+    .hljs{display:block;background:white;padding:0.5em;color:#333333;overflow-x:auto}.hljs-comment,.hljs-meta{color:#969896}.hljs-string,.hljs-variable,.hljs-template-variable,.hljs-strong,.hljs-emphasis,.hljs-quote{color:#df5000}.hljs-keyword,.hljs-selector-tag,.hljs-type{color:#a71d5d}.hljs-literal,.hljs-symbol,.hljs-bullet,.hljs-attribute{color:#0086b3}.hljs-section,.hljs-name{color:#63a35c}.hljs-tag{color:#333333}.hljs-title,.hljs-attr,.hljs-selector-id,.hljs-selector-class,.hljs-selector-attr,.hljs-selector-pseudo{color:#795da3}.hljs-addition{color:#55a532;background-color:#eaffea}.hljs-deletion{color:#bd2c00;background-color:#ffecec}.hljs-link{text-decoration:underline}
+  </style>
+
+
+
+  <style type="text/css" media="screen">
+    .progressive{overflow:hidden;position:relative;background:#efefef}.progressive__img{width:100%;height:100%;position:absolute;-webkit-transform:translateZ(0);transform:translateZ(0)}.progressive--not-loaded{filter:blur(30px);-webkit-filter:blur(30px)}.progressive--is-loaded{filter:blur(20px);-webkit-filter:blur(20px);-webkit-animation:sharpen .5s both;animation:sharpen .5s both}@-webkit-keyframes sharpen{from{filter:blur(20px);-webkit-filter:blur(20px)}to{filter:blur(0);-webkit-filter:blur(0)}}@keyframes sharpen{from{filter:blur(20px);-webkit-filter:blur(20px)}to{filter:blur(0);-webkit-filter:blur(0)}}
+  </style>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="http://thomasruble.com/css/solarized-light.css">
+
+  <link rel="stylesheet" href="http://thomasruble.com/css/style.css">
+
+
+
+<link rel="shortcut icon"
+
+    href="http://thomasruble.com/img/logo.png"
+
+>
+
+
+
+
+</head>
+
+
+<body>
+
+
+<div class="header column">
+
+    <div class="container">
+        
+        <a href="http://thomasruble.com/"><img class="logo" src="http://thomasruble.com/img/foologo.png" alt="logo"></a>
+        
+        <div class="content">
+            <a href="http://thomasruble.com/"><div class="name"><h1>The Fool</h1></div></a>
+            <nav>
+                <ul>
+                    
+                            <li><a href="http://thomasruble.com/blog/">Blog</a></li>
+                    
+                    
+                        
+                            
+                        
+                    
+                        
+                            
+                            <li><a href="http://thomasruble.com/projects">projects</a></li>
+                            
+                        
+                    
+                    
+                        
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="main post non-narrow zero-top-spacing column">
+    <div class="container">
+        <div class="content">
+            <div class="front-matter">
+                <div class="title-container">
+                    <div class="page-heading">
+
+    
+    real-time progress updates with django channels
+    
+
+</div>
+
+                </div>
+                <div class="meta">
+                    <div class="date" title="Tue Sep 12 2017 21:24:05 CDT">Sep 12, 2017</div>
+                    
+                        
+                    
+                    <div class="reading-time middot">13 minute read</div>
+                    <div class="tags">
+                        <ul>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/channels">channels</a> </li>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/websocket">websocket</a> </li>
+                          
+                            <li class="middot"><a href="http://thomasruble.com/tags/django">django</a> </li>
+                          
+                        </ul>
+                    </div>
+                    <div class="tags">
+                        <ul>
+                          
+                          
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="markdown">
+                
+    
+    
+
+<h1 id="abstract">Abstract</h1>
+
+<p>What follows is a simple demo for using the <a href="https://channels.readthedocs.io/en/stable/delay.html">Delay Server</a> in <a href="https://github.com/django/channels">Django Channels</a> to deliver asynchronous real-time progress updates over WebSockets.  Our demo backend will execute a long-running &lsquo;background task&rsquo;, and then send progress updates at regular intervals to a WebSocket client.  We&rsquo;ll also use channels to distribute our server load over multiple queues and worker processes.</p>
+
+<p>Full project code <a href="https://github.com/the-fool/prog-rock">here</a></p>
+
+<h1 id="why-django-channels">Why Django Channels?</h1>
+
+<p>Not <a href="https://channels.readthedocs.io/en/stable/">wat</a>, but why.  For pretty much the whole history of software, there was a handy solution to most problems with <em>performance</em>: just wait a year for CPU clock rates to improve.  Bingo!  Your program suddenly performs twice as fast!  But now the Age of Single-Threadedness is in decline, as CPU speed increases have begun mellowing out.  To improve our performance we need to make actual changes to the code and <em>architecture</em> of our software.  We get our speed-up by running multiple threads of execution in parallel.  Enter Channels.</p>
+
+<p>Django Channels takes a familiar tack: <a href="https://channels.readthedocs.io/en/stable/concepts.html#what-is-a-channel">a dedicated pool of worker processes consuming a task queue</a>.  This is a <em>message passing</em> paradigm.  Data is serialized and stuffed in a mailbox.  This is <em>not</em> shared memory concurrency.  The benefit of this worker-process-pool &amp; message-queue technique is that it is dead simple to implement (relative to &lsquo;shared mutable memory&rsquo; models, at least).  We create a task, push it onto a queue, and eventually a free process will scoop it up and do the work.</p>
+
+<p>Django Channels is a structural change in Django&rsquo;s web-server innards.  It breaks up the Django process into two teams: we have a dedicated server that receives requests and subsquently <em>enqueues</em> tasks, and a server (or pool thereof) that <em>consumes</em> those tasks.  Additionally, since a &lsquo;task&rsquo; and a &lsquo;consumer&rsquo; are pretty generic notions, Django is no longer just built for the traditional HTTP request/response pipeline.</p>
+
+<p>This is nothing novel.  In fact, most Django production environments are buoyed with software that follows this pattern: <a href="https://www.nginx.com/blog/thread-pools-boost-performance-9x/">nginx</a> for managing a pool of HTTP consumers, <a href="http://docs.gunicorn.org/en/stable/design.html">Gunicorn</a> for managing a pool of Python processes, and <a href="http://docs.celeryproject.org/en/latest/userguide/workers.html">Celery</a> for managing a different pool of Python processes.  Maybe in the future of the Channels project we won&rsquo;t have a use for so many auxillary worker-pool managers?</p>
+
+<h1 id="oh-and-websockets">Oh, and WebSockets</h1>
+
+<p>I forgot to mention WebSockets &ndash; Django Channels also provides a pretty neat way to do WebSocket-related things.  That&rsquo;s what we&rsquo;re about to get into.</p>
+
+<h1 id="the-problem-real-time-status-updates-at-regular-intervals">The Problem:  Real-Time status updates at regular intervals</h1>
+
+<p>I was recently charged to write a web-server that handles requests from its web-client for starting a long-running task on <em>another</em> server, and then sending the results back once it&rsquo;s complete.  The web-server is something of a proxy, brokering events between a backend service and a web-client.  It listens to a client, and sends the request for a task on through to the service.  But this backend service <em>also</em> provides a way to retrieve the progress of a task it&rsquo;s working on.  Since I can get the progress of a task, I also want to update the client at <em>regular intervals</em> with the status.</p>
+
+<p>One way to get regular updates is to let the <em>client</em> drive by making many HTTP requests over time, polling our web-server.  The downside of this is processing overhead for the backend (not only with respect to the bulky HTTP packets, but also that every request needs to be authenticated afresh).  Rejected!</p>
+
+<p>A better way is to use WebSockets.  That way, the client and the web-server can create a session, and the server can push updates straight to the client.  No need for the client to request them.  Nice, light, declarative &hellip; and fun!</p>
+
+<p>What we need now is just a way to get our Django app to poll the backend service periodically, and then send the client an update.  And, no, we are not going to go this route in our Django code:</p>
+
+<pre><code class="language-python"># this is wrong, wrong, wrong
+while not complete:
+  sleep(1)
+  current_status = poll_service(task_id)
+  update_client(current_status)
+  complete = current_status['complete']
+</code></pre>
+
+<p>What we want to do is <em>queue</em> a slightly delayed task that polls the backend service.  We won&rsquo;t be putting threads to sleep.  Message queuing is also nice, light, declarative &hellip; and fun!</p>
+
+<h1 id="implementation-decision">Implementation Decision</h1>
+
+<p>To play with WebSockets in Django, <a href="https://djangopackages.org/grids/g/websockets/">there are options</a>.  But it seems pretty safe to assert that Channels is going to be the <em>de jure</em> solution, as well as <em>de facto</em>.</p>
+
+<p>But what about our timeout intervals?</p>
+
+<p>Typically, I&rsquo;d reach for <a href="http://www.celeryproject.org/">Celery</a> to address a problem like this.  With Celery you can specify a <a href="http://docs.celeryproject.org/en/latest/userguide/calling.html#eta-and-countdown">&lsquo;countdown&rsquo;</a> for a task, so that it won&rsquo;t be consumed until a set time into the future.</p>
+
+<p>Celery would be a perfectly fine solution! But it turns out that we can accomplish the feature with Django Channels alone.  In this case, we do not need to bring in the whole Celery project.  <em>Nota bene: Channels is <strong>not</strong> (yet?) a replacement for Celery, but they do overlap in places.</em></p>
+
+<p>Whereas Celery has its &lsquo;countdown&rsquo; attribute for its async tasks, Channels has a <a href="https://channels.readthedocs.io/en/stable/delay.html">delay server</a> for handling &lsquo;delayed&rsquo; tasks (i.e. tasks whose execution is meant to occur after at least a certain amount of time into the future).</p>
+
+<p>So, no Celery needed!  We can get <em>both</em> WebSocket goodness <em>and</em> regular timeout intervals with the same Django library.  What a world!</p>
+
+<h1 id="let-s-build-it">Let&rsquo;s build it</h1>
+
+<p>We&rsquo;re going to build a basic client that opens a WebSocket connection with our Django app, requests that a long-running task begin, and then gets hit with periodic updates until the task completes.</p>
+
+<p>Alert: this example is going to use Docker and <a href="https://docs.docker.com/compose/">docker-compose</a> to manage the multiple servers we need.  If you don&rsquo;t want to use Docker, there will only need to be slight modifications to the configuration of the Django app.</p>
+
+<p>Since we&rsquo;re rocking real-time progress, let&rsquo;s name our app ProgRock.  Go ahead and clone the repo:</p>
+
+<pre><code class="language-bash">git clone https://github.com/the-fool/prog-rock
+</code></pre>
+
+<p>Let&rsquo;s first look at the <code>requirements.txt</code> file.  There are some interesting Channels-specific thing in there.  They resulted from:</p>
+
+<pre><code class="language-bash">pip install channels
+pip install asgi_redis
+</code></pre>
+
+<p>The Channels package brings with it the <a href="https://github.com/django/daphne">Daphne</a> server.  And we also needed to install <code>asgi_redis</code> because we are going to use <a href="https://redis.io/">Redis</a> as our message-queue engine.</p>
+
+<p>Now take a look at the <code>docker-compose.yml</code>:</p>
+
+<pre><code class="language-text">
+version: '2'
+
+services:
+  redis:
+    image: redis:latest
+
+  django:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    ports:
+      - &quot;8000:8000&quot;
+    command: python manage.py runserver 0.0.0.0:8000
+
+  django-delay:
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    command: python manage.py rundelay
+</code></pre>
+
+<p>We have 3 separate services, but 2 of them are nearly identical.  The first Django service, which executes the &lsquo;runserver&rsquo; command, is going to be the &lsquo;main&rsquo; public facing web-server.  The second Django service is our &lsquo;delay server&rsquo;, whose mission is to handle the timeouts and enqueing of delayed tasks.</p>
+
+<p>If you don&rsquo;t recognize the <code>rundelay</code> argument passed to <code>manage.py</code>, don&rsquo;t fret!  It&rsquo;s a new feature added when we hook in the Django Channels app.  In our <code>settings.py</code> file you&rsquo;ll find:</p>
+
+<pre><code class="language-python">INSTALLED_APPS = [
+    . . .
+
+    # The Channels project apps
+    'channels',
+    'channels.delay',
+
+    . . .
+]
+</code></pre>
+
+<p>Simply registering the Channels app is all it takes to transform classical Django into the new distributed worker architecture!</p>
+
+<p>But Channels won&rsquo;t do much without some configuration.  We need to add Channels-specific plumbing.  Also in <code>settings.py</code>:</p>
+
+<pre><code class="language-python">CHANNEL_LAYERS = {
+    &quot;default&quot;: {
+        &quot;BACKEND&quot;: &quot;asgi_redis.RedisChannelLayer&quot;,
+        &quot;CONFIG&quot;: {
+            &quot;hosts&quot;: [(&quot;redis&quot;, 6379)],
+        },
+        &quot;ROUTING&quot;: &quot;config.routing.channel_routing&quot;,
+    },
+}
+</code></pre>
+
+<p>This is pretty simple.  We need to identify three things to get off the ground: our backend implementation for the message queue, configuration for that backend, and configuration for the rules of our channels (routing).  In our case, we&rsquo;re using Redis as the backend.  As far as I can surmise, Redis is currently the most popular pick, and if there is any downside to using Redis instead of another message-queue broker, I haven&rsquo;t yet discovered it.  Our &lsquo;hostname&rsquo; for Redis is simply the name of the Dockerized Redis service, which in our yaml config is <code>redis</code>.</p>
+
+<p><strong>Routing</strong> is very similar to the url rules we would specify for our HTTP Django apps.  The way I see it, channels routing is just a slightly more generalized abstraction of the same idea behind a Django url rule.  A Channels route is not much more than a rule for turning raw events into a message, placing that message into a queue, and a rule for what sub-routine consumes which queue.</p>
+
+<p>With url rules in Django we typically have a <em>root level</em> table which imports in <em>app specific</em> sub routes.  We follow the same design principle with Channels routing.  Our root <code>routing.py</code> looks like this:</p>
+
+<pre><code class="language-python">from channels.routing import include
+
+channel_routing = [
+    include('progrock.routing.public_routing', path=r'^/prog/'),
+    include('progrock.routing.internal_routing')
+]
+</code></pre>
+
+<p>And then our app-specific sub-module <code>progrock/routing.py</code> in the ProgRock app is is this:</p>
+
+<pre><code class="language-python">from channels.routing import route
+from .consumers import ws_receive, ws_connect, worker
+
+public_routing = [
+    route('websocket.connect', ws_connect),
+    route('websocket.receive', ws_receive),
+]
+
+internal_routing = [
+    route('prog-rocker', worker)
+]
+</code></pre>
+
+<p>We define an <em>internal</em> and a <em>public</em> routing as way to distinguish the sort of routes that relate to requests made from an external client, and those other routing rules which are only inside our app itself.  Notice that the public routes are prefixed by a <code>path</code> regex &ndash; this is a way to namespace WebSocket events to a particular app.  <em>(In this demo there is only 1 WebSocket receiver &ndash; so this namespacing is not very useful, but it&rsquo;s good practice anyway!)</em></p>
+
+<p>Another thing to note is that route definitions are just a 2-part tuple &ndash; a string key and a sub-routine.  The &lsquo;channel&rsquo; is named by the string key.  Django Channels provides out-of-the-box a few conventional names for common channels. Two such conventional names are the <code>websocket.connect</code> and <code>websocket.receive</code> channels.  More on this in a minute.</p>
+
+<p>Our third route defines an all-custom channel: the <code>prog-rocker</code> channel.  All we need to do is name it, and it comes into existence!  This channel is going to be for a special worker responsible for doing low-priority things such as sending progress updates and polling the backend service.  We separate our queues for <em>receiving</em> messages from the queue for <em>responding</em> to messages.  This is because we don&rsquo;t want slow responses to get in the way of our receiver-workers.</p>
+
+<p>To see how these channels gear into the web-client, let&rsquo;s look at the frontend code.  First, the relevant HTML:</p>
+
+<pre><code class="language-html">&lt;button id=&quot;go-button&quot;&gt;Rock Out&lt;/button&gt;
+&lt;div&gt;
+  Progress &lt;span id=&quot;prog-val&quot;&gt;0%&lt;/span&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>Just a button and some text indicating the progress.  What we are going to do is fire up a task when the user clicks the button, and then update the progress in the markup.  Here is all of the JavaScript:</p>
+
+<pre><code class="language-javascript">var ws_scheme = window.location.protocol == &quot;https:&quot; ? &quot;wss&quot; : &quot;ws&quot;;
+var ws_path = ws_scheme + '://' + window.location.host + '/prog/';
+
+var socket = new WebSocket(ws_path);
+
+socket.onmessage = onmessage;
+document.getElementById('go-button').onclick = start;
+
+function onmessage(msg) {
+  var value = document.getElementById('prog-val');
+  var data = JSON.parse(msg.data);
+
+  if (data.progress) {
+    value.innerHTML = data.progress + '%';
+  }
+
+  if (data.complete) {
+    value.classList.add('complete');
+  }
+}
+
+function start() {
+  var msg = {
+    action: 'start'
+  };
+
+  socket.send(JSON.stringify(msg));
+}
+</code></pre>
+
+<p>The path of the WebSocket matches with the namespacing rule in our root channel routing.  WebSocket requests with the path <code>/prog/</code> go to our ProgRock app.  After establishing a WebSocket connection, the client reacts to future messages with appropriate updates.  Relevant messages we listen to are going to be of type <code>{progress: number, complete: boolean}</code>.  Not the most robust way to serialize state &ndash; but it&rsquo;s good enough for a demo!</p>
+
+<p>Now to the main course: the <code>consumers.py</code> module in our ProgRock app.  First, the two simple consumer routines for connecting and receiving WebSocket events:</p>
+
+<pre><code class="language-python">import json
+from channels import Channel
+
+def ws_connect(msg):
+    msg.reply_channel.send({'text': json.dumps({&quot;accept&quot;: True})})
+
+
+def ws_receive(message):
+    data = json.loads(message['text'])
+    reply_channel = message.reply_channel.name
+
+    if data['action'] == 'start':
+        Channel('prog-rocker').send({
+            'reply_channel': reply_channel,
+            'command': 'start',
+        })
+</code></pre>
+
+<p>The <code>ws_connect</code> consumer reacts to new WebSocket connections.  For our case, it actually does not need to do anything.  We immediately send back an acknowledgement message for debugging purposes.  All other &lsquo;sends&rsquo; back to the web client are going to queued up for a dedicated consumer (below).</p>
+
+<p>The <code>ws_receive</code> is for messages sent from the web-client over a WebSocket to our app.  Looking up at the javascript, there is only one such message: <code>{action: 'start'}</code>.  In a more complicated app, our Django code would likely have a big &lsquo;switch&rsquo; of <code>if -- elif -- elif</code> parsing the message action.  In our single switch, the consumer catches the <code>'start'</code> action and reacts.</p>
+
+<p>Starting a new long-running task is very low-priority, so we want to bail from this consumer sub-routine without going through the trouble of firing up the task.  That is why we <em>pass this message onto a worker queue</em>.  The <code>Channel()</code> constructor is used to call up a registered channel by name, after which you can call methods on it.  We are going to <code>.send()</code> a message to that channel.  Our internal <code>prog-rocker</code> API is looking for a `<code>command</code> to specify what it should do, and it also needs a <code>reply_channel</code> so that it knows how to communicate with the open WebSocket connection to the client.</p>
+
+<p>So far so good.  We handle WebSocket messages with something like a proxy.  It switches on an <code>action</code> (e.g. <code>'start'</code>), and does no more work than sending a message to another queue.  When sychronicity does not truly matter, it is generally good practice to opt for the asynchronous path.  We don&rsquo;t <em>need</em> to respond right away, so we queue up the response and move on.</p>
+
+<p>Now comes the complicated part.  Our special worker sub-routine.  Without further ado, here is the sub-routine from the <code>consumers.py</code> module <em>in toto</em>:</p>
+
+<pre><code class="language-python">def worker(msg):
+    def delayed_message(reply_channel, progress, action):
+        return {
+            'channel': 'prog-rocker',
+            'content': {
+                'reply_channel': reply_channel,
+                'action': action,
+                'progress': progress,
+            },
+            'delay': 200
+        }
+
+    def delayed_send(msg):
+        Channel('asgi.delay').send(msg, immediately=True)
+
+    def send_to_ws(reply_channel, content):
+        Channel(reply_channel).send({'text': json.dumps(content)})
+
+    def send_progress(reply_channel, progress):
+        send_to_ws(reply_channel, {'progress': progress})
+
+    action = msg.content['action']
+    reply = msg.content['reply_channel']
+
+    if action == 'start':
+        # start a long running background task!
+        # (this is just a mockup, using number to represent the progress of a background task)
+        progress = 0
+
+        send_progress(reply, progress)
+
+        new_msg = delayed_message(reply, progress, 'continue')
+        delayed_send(new_msg)
+
+    elif action == 'continue':
+        # check in on the background task
+        # (we are simulating a task by incrementing a number)
+        progress = msg.content['progress'] + 3
+        if progress &gt;= 100:
+            send_to_ws(reply, {'complete': True, 'progress': 100})
+        else:
+            send_progress(reply, progress)
+            new_msg = delayed_message(reply, progress, 'continue')
+            delayed_send(new_msg)
+</code></pre>
+
+<p>There&rsquo;s a lot going on here.  But most of the code above is a collection of inner helper funcitons.  The procedural stuff is near the bottom.  Again, we switch on an action.  When the action is <code>'start'</code>, we want to execute the long-running background task on the third party server.  For simplicity in this mockup, we&rsquo;ll just assign a variable to 0.</p>
+
+<p>Now that we have a brand new task started, we send a message through the WebSocket back to the client.  This in itself is a great accomplishment!  We&rsquo;ve made a beautiful architecture where we receive messages and queue up their responses, keeping things lean and mean.</p>
+
+<p>An interesting part is how we implement the interval delay for polling.  Remember that we registered the app <code>channels.delay</code> in the <code>INSTALLED_APPS</code> list?  This app provides a channel <code>'asgi.delay'</code>.  Messages to this channel are meant to be delayed in execution.  We wrap the &lsquo;real&rsquo; message in a structure that includes the time to delay, and also the name of the channel to send the message when it&rsquo;s time has come.  The message sent to the delay server is:</p>
+
+<pre><code class="language-python">{
+  'channel': 'prog-rocker',
+  'content': {
+    'reply_channel': reply_channel,
+    'action': action,
+    'progress': progress,
+  },
+  'delay': 200
+}
+</code></pre>
+
+<p>The <code>content</code> is the &lsquo;real&rsquo; message.  The <code>delay</code> is the time in milliseconds.  And the <code>channel</code> is the channel.  Notice that we are recursing!  This is a very common pattern in message-passing architectures.  Also note that our consumer sub-routine only has <em>stack-local</em> state, so we need to pass in the <code>reply_channel</code> again.  We can&rsquo;t, for example, save it in a global variable.</p>
+
+<p>After we recurse the first time, the action is to <code>'continue'</code>.  In our worker, the switch polls the backend service (again, this &lsquo;polling&rsquo; is just mocked up), and then it checks whether or not the task has completed, and sends the appropriate message down the line.</p>
+
+<p>Lather, rinse, recurse!</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We&rsquo;ve used Django Channels to handle WebSocket communication.  And we&rsquo;ve used Django Channels to implement delayed tasks; we queued up a task to run after a specified point in the future.  We also put together a very clean and scalable separation of our receive &amp; response workers.  By breaking those features up into small consumable tasks, we increase the parallelism of our app.  Welcome to real-time asynchronous Django!</p>
+
+
+            </div>
+            
+            
+            
+
+            
+
+            
+        </div>
+    </div>
+</div>
+
+
+
+<div class="footer column">
+    <div class="container">
+
+        
+
+        <div class="copyright">
+
+        
+            
+                <a href="http://thomasruble.com/license">Copyright © 2018 Thomas Ruble</a>
+            
+        
+
+        </div>
+        <div class="icons">
+
+        
+
+        
+
+        
+
+        
+
+        
+            <a href="https://github.com/the-fool" target="_blank">
+                <img class="icon" src="http://thomasruble.com/img/github.svg" alt="github" />
+            </a>
+        
+
+        
+
+        
+            <a href="https://www.linkedin.com/in/thomas-ruble-307b65106" target="_blank">
+                <img class="icon" src="http://thomasruble.com/img/linkedin.svg" alt="linkedin" />
+            </a>
+        
+
+        
+
+        
+            <a href="mailto:tr@thomasruble.com">
+                <img class="icon" src="http://thomasruble.com/img/email.svg" alt="email" />
+            </a>
+        
+
+        
+            <a href="http://thomasruble.com/index.xml">
+                <img class="icon" src="http://thomasruble.com/img/rss.svg" alt="rss" />
+            </a>
+        
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    google: {
+      families: ['Raleway:400,600,700', 'Merriweather:300,300i,700,700i', 'Ubuntu+Mono:400,700']
+    }
+  });
+</script>
+
+
+
+  <script src="http://thomasruble.com/js/highlight.min.js" defer></script>
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/elm.min.js" defer></script>
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/typescript.min.js" defer></script>
+  
+
+
+
+  <script src="http://thomasruble.com/js/progressively.min.js" defer></script>
+
+
+
+
+
+
+
+
+<script>
+  window.onload = function() {
+    
+      hljs.initHighlighting();
+    
+    
+      progressively.init({delay: 30, throttle: 50});
+    
+    
+  };
+</script>
+
+
+
+
+</body>
+</html>
+

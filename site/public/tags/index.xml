@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on The Fool</title>
+    <link>http://thomasruble.com/tags/</link>
+    <description>Recent content in Tags on The Fool</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Thu, 22 Mar 2018 21:24:05 -0500</lastBuildDate>
+    
+	<atom:link href="http://thomasruble.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Angular</title>
+      <link>http://thomasruble.com/tags/angular/</link>
+      <pubDate>Thu, 22 Mar 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/angular/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Async</title>
+      <link>http://thomasruble.com/tags/async/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/async/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Asyncio</title>
+      <link>http://thomasruble.com/tags/asyncio/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/asyncio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Channels</title>
+      <link>http://thomasruble.com/tags/channels/</link>
+      <pubDate>Tue, 12 Sep 2017 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/channels/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Django</title>
+      <link>http://thomasruble.com/tags/django/</link>
+      <pubDate>Tue, 12 Sep 2017 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/django/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Effects</title>
+      <link>http://thomasruble.com/tags/effects/</link>
+      <pubDate>Thu, 22 Mar 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/effects/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Midi</title>
+      <link>http://thomasruble.com/tags/midi/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/midi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Music</title>
+      <link>http://thomasruble.com/tags/music/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/music/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ngrx</title>
+      <link>http://thomasruble.com/tags/ngrx/</link>
+      <pubDate>Thu, 22 Mar 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/ngrx/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Python</title>
+      <link>http://thomasruble.com/tags/python/</link>
+      <pubDate>Wed, 04 Apr 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Redux</title>
+      <link>http://thomasruble.com/tags/redux/</link>
+      <pubDate>Fri, 23 Feb 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/redux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Spa</title>
+      <link>http://thomasruble.com/tags/spa/</link>
+      <pubDate>Fri, 23 Feb 2018 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/spa/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Websocket</title>
+      <link>http://thomasruble.com/tags/websocket/</link>
+      <pubDate>Tue, 12 Sep 2017 21:24:05 -0500</pubDate>
+      
+      <guid>http://thomasruble.com/tags/websocket/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
