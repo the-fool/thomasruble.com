@@ -42,4 +42,41 @@ mkdir Frontend
 mkdir Backend
 ```
 
-Now is where we need to scaffold out the boilerplate code for both our 
+Now is where we need to scaffold out the boilerplate code for both our projects.  Nothing stops you from writing it by hand, following the [provided code](https://github.com/the-fool/dotnet-postgres-docker) as a guide -- but you could also have most of the project code generated for you using Microsoft & Angular tools.  
+
+Let's scaffold the backend first.
+
+```bash
+cd Backend
+# create a new solution
+docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet new sln -n gadget_depot
+# create the webapi project
+mkdir GadgetDepot
+docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet new webapi -o GadgetDepot
+# add the project to the solution
+docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet sln add GadgetDepot
+```
+
+If you had the `dotnet` program installed on your OS, you could just use that.  But, mostly to prove a point, you can also scaffold all this code through `docker` without needing to worry about platform-specific installation.
+
+We can also leverage Docker for creating our Angular app!
+
+Go back to the root of our project, and on into the Frontend dir.
+
+```bash
+cd ..
+cd Frontend
+```
+
+Here we're going to use a Docker image that contains the [Angular CLI tool](https://cli.angular.io/).  Simply run the `new` command, specifying that we want a minimal app in the current directory.
+
+```bash
+docker run -v $(pwd):/app -w /app johnpapa/angular-cli ng new gadgets --minimal --direc
+tory ./
+```
+
+After a few minutes, you should have a fully armed and ready to use Angular app.
+
+The last step is to arrange these separate modules so that they boot up the right way, and can network with each other.
+
+To orchestrate multiple containers, we'll use [Docker Compose](https://docs.docker.com/compose/).
