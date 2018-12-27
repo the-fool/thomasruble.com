@@ -9,7 +9,7 @@ tags = ["Docker", ".NET", "Postgres"]
 
 ## Abstract
 
-In this article, you'll learn how to set up a fresh [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) project to use a [PostgreSQL](https://www.postgresql.org/) database.  We'll do this the easy way: using [Docker](https://www.docker.com/) to take care of all the heavy lifting when it comes to installing these packages.  In fact, it's so easy to use Docker, we'll throw in an [Angular](https://angular.io/) app just because we can.
+In this tutorial, you'll learn how to set up a fresh [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) project connected to a [PostgreSQL](https://www.postgresql.org/) database.  Instead of going through the hoops to install these packages on your OS, we'll get up and running the easy way: with [Docker](https://www.docker.com/).  Docker will take care of all the heavy lifting when it comes to installing these packages, coordinating their execution, and monitoring their operation.  In fact, it's so easy to develop with Docker, we'll throw in an [Angular](https://angular.io/) app just because we can!  By the end, we'll have a full web-app framework in place, with a client, REST API, and database ready to go.
 
 ## Show me the code!
 
@@ -27,24 +27,26 @@ Read on to see how we build this up from scratch...
 
 ## Application structure
 
-Our mission is to build a web app for the international retail chain **Gadget Depot**.  We're going to go about doing this with a basic .NET Core web api, backed by PostgreSQL, and consumed with an Angular client.  Let's make the root project directory.
+Our mission is to build a web app for the international retail juggernaut **Gadget Depot**.  We're going to go about this with a .NET Core web api, backed by PostgreSQL, and consumed with an Angular client.  Simple stuff!  
+
+Pick a spot in your filesystem, and let's make the root project directory.
 
 ```bash
 mkdir gadget_depot
 cd gadget_depot
 ```
 
-It'll be nice to keep the server code & client code totally separate, so start with making 2 sub-directories.
+It'll be nice to keep the server code & client code totally separate.  To indicate their independence start with making 2 sub-directories.
 
 ```bash
-# at the project
+# at the project root
 mkdir Frontend
 mkdir Backend
 ```
 
-Now is where we need to scaffold out the boilerplate code for both our projects.  Nothing stops you from writing it by hand, following the [provided code](https://github.com/the-fool/dotnet-postgres-docker) as a guide -- but you could also have most of the project code generated for you using Microsoft & Angular tools.  
+Now we need to scaffold out the boilerplate code for both our projects.  Nothing stops you from writing it by hand, following the [provided code](https://github.com/the-fool/dotnet-postgres-docker) as a guide -- but you could also have most of the project code generated for you using official Microsoft & Angular tools.  
 
-Let's scaffold the backend first.
+Let's scaffold the backend first, using the `dotnet` program.
 
 ```bash
 cd Backend
@@ -55,6 +57,29 @@ mkdir GadgetDepot
 docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet new webapi -o GadgetDepot
 # add the project to the solution
 docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet sln add GadgetDepot
+```
+
+In the `Backend` directory, you should have a file tree resembling the following:
+
+```text
+│   GadgetDepot.sln
+│
+└───GadgetDepot
+    │   appsettings.Development.json
+    │   appsettings.json
+    │   GagdetDepot.csproj
+    │   Program.cs
+    │   Startup.cs
+    │
+    ├───bin
+    │
+    ├───Controllers
+    │
+    ├───Models
+    │
+    ├───obj
+    │
+    ├───Properties
 ```
 
 If you had the `dotnet` program installed on your OS, you could just use that.  But, mostly to prove a point, you can also scaffold all this code through `docker` without needing to worry about platform-specific installation.
