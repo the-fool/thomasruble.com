@@ -48,6 +48,8 @@ mkdir Backend
 
 Now we need to scaffold out the boilerplate code for both our projects.  Nothing stops you from writing it by hand, following the [completed code](https://github.com/the-fool/dotnet-postgres-docker) as a guide. However, Microsoft & Angular each provide tools for generating starter-templates.  We'll use those tools to save us some time & tedium.  
 
+### Scaffold .NET Core backend
+
 Let's scaffold the backend first, using the `dotnet` program.
 
 ```bash
@@ -86,6 +88,8 @@ In the `Backend` directory, you now should have a file tree resembling the follo
 
 Notice that we used a Dockerized `dotnet` executable.  If you already had the `dotnet` program installed on your OS, you could just use that -- or could you?  One concern is _which version_ of `dotnet` are you running?  And if you udpate it for this project, would you then break your SDK for existing projects in your environment?  Docker to the rescue.   We were able to  scaffold all this code through without needing to worry about platform-specific installation of `dotnet`.
 
+### Scaffold Angular frontend
+
 No surprise: We can also leverage Docker for creating our Angular app!
 
 Go back to the root of our project, and on into the Frontend dir.
@@ -105,6 +109,8 @@ tory ./
 After a few minutes, you should have a fully armed and ready to use Angular app.
 
 The last step is to arrange these separate modules so that they boot up the right way, and can network with each other.
+
+### Docker-Compose enters the ring
 
 To orchestrate multiple containers, we'll use [Docker Compose](https://docs.docker.com/compose/).  It's a handy tool for configuring your Dockerized apps to work together.
 
@@ -188,6 +194,8 @@ CMD /entrypoint.sh
 
 Each of these are very similar & straight forward.  They each allude to an `entrypoint.sh` script, which will get run by default when the container starts.
 
+### Write the startup scripts
+
 For the last bit of Docker plumbing, we need to write an entry script for each of our services.  This script acts as the 'bootup' command for the containers.  The frontend and the backend scripts resemble each other closely -- they each install dependecies and start a dev server.
 
 For `./Backend/entrypoint.sh`
@@ -236,6 +244,8 @@ With one line, all the containers will build & configure themselves, ready to pr
 
 Well -- not quite!  We've scaffolded all the Docker features of the app, but now we need to hack on the application source code to get things in line.  Out of the box, .NET Core is not expecting to work with PostgreSQL -- this is the first feature we're going to fix.
 
+### Add the Npgsql dependency
+
 To teach .NET how to interface with PostgreSQL, we're going to add the [Npgsql](http://www.npgsql.org/efcore/index.html) library.  Simply add the reference to Npgsql to your `./Backend/GadgetDepot/GadgetDepot.csproj` file:
 
 ```xml
@@ -264,6 +274,8 @@ That's all for added dependencies!
 
 Next, we need to give our app with a connection string for the dockerized PostgreSQL database.  This connection string specifies the username, password, host address, and database name for our connection.
 
+### Configure .NET database connection
+
 Update your `appsettings.json` to resemble the following:
 
 ```json
@@ -282,3 +294,56 @@ Update your `appsettings.json` to resemble the following:
 ```
 
 Notice the key=value: `Server=db`.  Where does the hostname `db` come from?  This is just the name we gave our database service in the `docker-compose.yml`.  Internally, Docker sets up a kind of DNS for addressing services from within the networked containers, where each service's name functions as its hostname.  So, directing the .NET program to the hostname `db` will send it straight toward the PostgreSQL instance.
+
+### Add the Npgsql Entity Framework service
+
+The last bit of code needed to set up our PostgreSQL connection in the .NET app is an Entity Framework adapter.  
+
+We'll add this adapter service to the `Startup` class in the `Backend/GadgetDepot/Startup.cs` file.  Update the `ConfigureServices` method in your `Startup` class so that it includes the call to the `IServiceCollection.AddEntityFrameworkNpgsql` method, making use of the connection string we created up above.
+
+```csharp
+public class Startup
+{
+  public Startup(IConfiguration configuration)
+  {
+    Configuration = configuration;
+  }
+
+  public IConfiguration Configuration { get; }
+
+  public void ConfigureServices(IServiceCollection services)
+  {
+    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+    //
+    // Add this following call to provide PostgreSQL support
+    //
+    services.AddEntityFrameworkNpgsql().AddDbContext<DbContext>(options =>
+      options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
+        
+  }
+
+  public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+  {
+    if (env.IsDevelopment())
+    {
+      app.UseDeveloperExceptionPage();
+    }
+    else
+    {
+      app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseMvc();
+  }
+}
+```
+
+That'll do it!  Now you have an ASP.NET Core app communicating with PostgreSQL.  Congrats!  All that remains is to load up some gadgets, and display them in the Angular app.  Gadget Depot will be happy, and so will we.
+
+
+
+
+
+
