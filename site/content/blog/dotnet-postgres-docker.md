@@ -483,4 +483,92 @@ Note that this `Initiailize` call will run _every time_ the app boots.  In the f
 
 ### Write an API Controller for Gadgets
 
-To round out our API, we need to add a controller class for exposing the gadget data.
+To round out our API, we need to add a controller class for exposing the gadget data.  As with the steps it took to provision the DB, you can find an in-depth guide to this facet of ASP.NET programming in [other tutorials](https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-2.2&tabs=visual-studio).  We'll just copy in the code so we can get our Gadget Depot app delivered on schedule!
+
+Create the file `Backend/GadgetDepot/Controllers/GadgetController.cs`:
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GadgetDepot.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GadgetDepot.Controllers 
+{
+  [Route("api/[controller]")]
+  [ApiController]
+  public class GadgetsController : ControllerBase 
+  {
+    ApiDbContext ctx;
+
+    public GadgetsController(ApiDbContext _ctx) 
+    {
+      ctx = _ctx;
+    }
+
+    [HttpGet]
+    public ActionResult<List<Gadget>> Get() 
+    {
+      return ctx.Gadgets.ToList();
+    }
+  }
+}
+```
+
+This is all it takes for `localhost:5000/api/gadgets` to return our list of gadget inventory in nice, JSONified form.  All that's left to do is make our Angular app consume this API.  
+
+
+## Build an Angular Web Client
+
+So long to the .NET code.  Now move over to the `Frontend` directory and get ready to write an Angular app.  Well, it's not going to be much of an app at all.  And Angular is certainly overkill for what we're setting out to accomplish.  But it's so easy to set up using Docker and the `ng` tool that we may as well lay a good foundation for future iteration on Gadget Depot's web app.
+
+Change the `src/app/app.component.ts` file so that the main component will connect to the REST API backend:
+
+```js
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+interface Gadget {
+  id: number;
+  name: string;
+}
+
+@Component({
+  selector: 'app-root',
+  template: `
+  <h1>Gadget Depot</h1>
+  <ul>
+    <li *ngFor="let gadget of gadgets">
+      {{ gadget }}
+    </li>
+  </ul>
+  `
+})
+export class AppComponent implements OnInit {
+  gadgets: string[] = [];
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit() {
+    this.http.get<Gadget[]>('http://localhost:5000/api/gadgets')
+      .subscribe(gs => {
+        this.gadgets = gs.map(g => g.name);
+      });
+  }
+}
+```
+
+Be sure to import the `HTTPClientModule` in your `AppModule`, and your Gadget Depot client is minimally viable. 
+
+## Wrap-up
+
+We used Docker to build a whole full-stack web-app.  ASP.NET Core, PostgreSQL, and Angular all working together right out of the box.  Kudos!
+
+To run your app, all that needs doing is a call to `docker-compose` in the root directory:
+
+```bash
+docker-compose up
+```
+
+Watch as all your services spring to life, networked with each other, in a cozy, containerized world unto themselves.  
