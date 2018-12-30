@@ -340,10 +340,147 @@ public class Startup
 }
 ```
 
-That'll do it!  Now you have an ASP.NET Core app communicating with PostgreSQL.  Congrats!  All that remains is to load up some gadgets, and display them in the Angular app.  Gadget Depot will be happy, and so will we.
+That'll do it!  Now you have an ASP.NET Core app communicating with PostgreSQL.  Congrats!  All that remains is to load up some gadgets, and display them in the Angular app.  Gadget Depot is going to have its deadline met.
 
+## Build the API
 
+Time to build out the REST API for our gadgets.  This section isn't really about PostgreSQL or Docker in particular, and touches on the same topics that a bunch of other ASP.NET core tutorials already cover very well.  So, while this part will go by quickly, take a gander at the [official Microsoft docs](https://docs.microsoft.com/en-us/aspnet/core/data/ef-rp/intro?view=aspnetcore-2.2&tabs=visual-studio) to learn more.
 
+### Model a Gadget
 
+For our requirements, a gadget is just a name and nothing else.  To model it in our app, go to the `GadgetDepot/Models` directory, add a new class `Gadget` in `Gadget.cs`:
 
+```csharp
+namespace GadgetDepot.Models {
+    public class Gadget {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}
+```
 
+That'll do just fine.  Next, we need to integrate this model declaration with our database.  In order to do this, we need to implement the `DbContext` interface, with our new `Gadget` class taking a leading role.
+
+### Include Gadgets in the Database Context
+
+Create the file `Backend/GadgetDepot/ApiDbContext.cs`, and write our custom Gadget Depot `DBContext` to include the `Gadget` model as so:
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+using GadgetDepot.Models;
+
+namespace GadgetDepot {
+  public class ApiDbContext : DbContext {
+    public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
+
+    public DbSet<Gadget> Gadgets { get; set; }
+  }
+}
+```
+
+This class declares that our app's persistenc layer has a set of gadgets, which will be implemented in PostgreSQL as a single table.
+
+To use this context, simply swap out the `DbContext` that we declared in the `Startup` class. Be sure to add a `using GadgetDepot.Models` at the head of the file, and then make the change to the `ConfigureServices` method in the `GadgetDepot.Startup` class:
+
+```csharp
+public void ConfigureServices(IServiceCollection services) 
+{
+  services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+  // DbContext -> ApiDbContext
+  services.AddEntityFrameworkNpgsql().AddDbContext<ApiDbContext>(options =>
+      options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
+}
+```
+
+With this change, Entity Framework Core will be expecting a table called "Gadgets" in the PostgreSQL database.  At this stage we're primed to make a migration file and update the schema of the db.  Navigate your shell to the `Backend/GadgetDepot` project and run the following commands to create & apply a migration.
+
+```bash
+docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet ef migrations add Initial
+docker run -v $(pwd):/app -w /app microsoft/dotnet dotnet ef database update
+```
+
+### Initialize the Database
+
+As a final flourish, we can insert some test gadgets into the database.  Create the file `Backend/GadgetDepot/DbInitializer.cs` with the following class:
+
+```csharp
+using GadgetDepot.Models;
+using System.Linq;
+
+namespace GadgetDepot 
+{
+  public class DbInitializer 
+  {
+    public static void Initialize(ApiDbContext ctx) 
+    {
+      ctx.Database.EnsureCreated();
+      var test = ctx.Gadgets.FirstOrDefault();
+      if (test == null) 
+      {
+        ctx.Gadgets.Add(new Gadget { Name = "plumbus" });
+        ctx.Gadgets.Add(new Gadget { Name = "flux capacitor" });
+        ctx.Gadgets.Add(new Gadget { Name = "spline reticulator" });
+        ctx.SaveChanges();
+      }
+    }
+  }
+}
+```
+
+The static `Initialize` method will programmatically make sure that the database `gadget` is in fact existent, and if the "Gadgets" table is empty, it will add a few test rows.
+
+We can make this method run at startup time by inserting a call to `Initialize` in the `Main` method of the `Program` class.  The method has a dependency on a database context, and so we need to get that context from within `Main`.  Alter your `Backend/GadgetDepot/Program.cs` file to mimic the following:
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace GadgetDepot 
+{
+  public class Program 
+  {
+    public static void Main(string[] args) 
+    {
+      var host = CreateWebHostBuilder(args).Build();
+      using(var scope = host.Services.CreateScope()) 
+      {
+        var services = scope.ServiceProvider;
+
+        var context = services.GetRequiredService<ApiDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        try 
+        {
+          DbInitializer.Initialize(context);
+        } 
+        catch (Exception ex) 
+        {
+          logger.LogError(ex, "An error occurred creating the DB.");
+        }
+      }
+
+      host.Run();
+    }
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+        .UseStartup<Startup>();
+  }
+}
+```
+
+The trick here is creating a scope wherein we can access the services -- most importantly, an `ApiDbContext` instance.  Passing this context into the `DbInitializer.Initialize` method allows it to make a connection with the database, and execute its routine.  
+
+Note that this `Initiailize` call will run _every time_ the app boots.  In the future, we might want a more sophisticated way to condition whether or not we want this code to run, but for the sake of immediate development, this is good enough for Gadget Depot.
+
+### Write an API Controller for Gadgets
+
+To round out our API, we need to add a controller class for exposing the gadget data.
