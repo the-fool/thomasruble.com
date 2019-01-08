@@ -1,4 +1,5 @@
 +++
+slug = "dockerize-dotnet-postgres-angular"
 date = "2018-11-04T21:24:05-05:00"
 title = "Dockerize .NET Core, Postgres, and Angular"
 description = "Quickly scaffold a .NET Core & Postgres app with Docker"
@@ -155,9 +156,9 @@ services:
 
 In this file, we declare our three separate _services_ comprising the app.  
 
-    - `web` : the .NET Core project
-    - `db` : the database
-    - `client` : the Angular app
+    - web : the .NET Core project
+    - db : the database
+    - client : the Angular app
 
 One piece especially worth pointing out is the `local_postgres_data` volume.  By declaring a "volume" we can _persist_ our database state beyond the lifetime of the `db` container.  The call to create a volume allocates space on the host OS which outlives the destruction of a container.  When we reboot our PostgreSQL service, the database will have retained all its tables & rows, ready to go as if nothing had happened.  If we didn't map the container's `/var/lib/postgresql/data` dir to our host filesystem, the container would boot with fresh state when created.  In some cases you might want this behavior!  But for development, it's convenient to keep some persistent state of the `db`.
 
